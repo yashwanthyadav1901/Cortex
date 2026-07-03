@@ -78,6 +78,15 @@ def upgrade() -> None:
             model            text,
             created_at       timestamptz NOT NULL DEFAULT now()
         );
+
+        -- Supabase exposes the public schema through its auto-generated REST API
+        -- (PostgREST). RLS with no policies blocks that path entirely; our own
+        -- API connects as the postgres role, which bypasses RLS.
+        ALTER TABLE topics ENABLE ROW LEVEL SECURITY;
+        ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
+        ALTER TABLE dsa_problems ENABLE ROW LEVEL SECURITY;
+        ALTER TABLE daily_activity_log ENABLE ROW LEVEL SECURITY;
+        ALTER TABLE plans ENABLE ROW LEVEL SECURITY;
         """
     )
 
