@@ -1,0 +1,17 @@
+{
+  "name": "Cortex",
+  "short_name": "Cortex",
+  "description": "Personal learning ops — System Design, AI, DSA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

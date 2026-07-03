@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "cortex-web",
+      "cwd": "apps/web",
+      "runtimeExecutable": "/Users/yashwanth/.nvm/versions/node/v22.18.0/bin/npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000
+    }
+  ]
+}
