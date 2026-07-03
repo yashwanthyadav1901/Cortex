@@ -7,7 +7,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     database_url: str
-    supabase_jwt_secret: str
+    supabase_url: str = ""  # project URL, used for JWKS token verification
+    supabase_jwt_secret: str = ""  # only needed on legacy HS256 projects
     allowed_email: str
 
     llm_base_url: str = "https://integrate.api.nvidia.com/v1"
