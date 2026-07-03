@@ -12,7 +12,8 @@ dependencies = [
     "pydantic>=2.7",
     "pydantic-settings>=2.3",
     "openai>=1.40",
-    "pyjwt[crypto]>=2.8",
+    "pyjwt[crypto]>=2.10",
+    "certifi",
     "python-dateutil>=2.9",
 ]
 

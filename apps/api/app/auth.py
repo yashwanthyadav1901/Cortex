@@ -1,3 +1,6 @@
+import ssl
+
+import certifi
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -13,7 +16,11 @@ def _get_jwks_client() -> jwt.PyJWKClient:
     if _jwks_client is None:
         base = get_settings().supabase_url.rstrip("/")
         _jwks_client = jwt.PyJWKClient(
-            f"{base}/auth/v1/.well-known/jwks.json", cache_keys=True
+            f"{base}/auth/v1/.well-known/jwks.json",
+            cache_keys=True,
+            # Framework/pyenv Python builds often lack system CA certs for
+            # urllib; pin certifi's bundle so the JWKS fetch can verify TLS.
+            ssl_context=ssl.create_default_context(cafile=certifi.where()),
         )
     return _jwks_client
 
