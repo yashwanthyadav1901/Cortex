@@ -11,10 +11,6 @@ class Settings(BaseSettings):
     supabase_jwt_secret: str = ""  # only needed on legacy HS256 projects
     allowed_email: str
 
-    llm_base_url: str = "https://integrate.api.nvidia.com/v1"
-    llm_api_key: str = ""
-    llm_model: str = "meta/llama-3.3-70b-instruct"
-
     cors_origins: str = "http://localhost:3000"
 
     @property

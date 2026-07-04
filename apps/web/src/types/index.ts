@@ -43,28 +43,3 @@ export interface Streak {
   active_today: boolean;
 }
 
-export interface PlanTopicItem {
-  pillar: Pillar;
-  name: string;
-  action: string;
-  est_hours: number;
-  why: string;
-}
-
-export interface PlanJson {
-  summary: string;
-  total_hours: number;
-  topics: PlanTopicItem[];
-  project: { title: string; task: string; est_hours: number } | null;
-  dsa_problems: { title: string; topic_tag: string; difficulty: Difficulty; why: string }[];
-  daily_breakdown: { day: string; focus: string; est_hours: number }[];
-}
-
-export interface Plan {
-  id: string;
-  week_start_date: string;
-  available_hours: number;
-  generated_json: PlanJson;
-  model: string | null;
-  created_at: string;
-}

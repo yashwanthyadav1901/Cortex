@@ -1,30 +1,30 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import PlanCard from "@/components/PlanCard";
+import { allNodes, PILLAR_LABELS, pillarToSlug, ROADMAPS } from "@/content";
 import { get, post } from "@/lib/api";
-import type { ActivityType, Plan, Streak } from "@/types";
+import type { ActivityType, Pillar, Streak, TopicStatus } from "@/types";
 
-const DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const PILLAR_ICONS: Record<Pillar, string> = {
+  system_design: "🏗️",
+  ai: "🤖",
+  dsa: "🧩",
+};
 
 export default function Dashboard() {
   const [streak, setStreak] = useState<Streak | null>(null);
-  const [plan, setPlan] = useState<Plan | null>(null);
+  const [progress, setProgress] = useState<Record<string, TopicStatus>>({});
   const [loading, setLoading] = useState(true);
-  const [hours, setHours] = useState(10);
-  const [generating, setGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
       const [s, p] = await Promise.all([
         get<Streak>("/streak"),
-        get<Plan | null>("/plan/current"),
+        get<Record<string, TopicStatus>>("/progress"),
       ]);
       setStreak(s);
-      setPlan(p);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setProgress(p);
     } finally {
       setLoading(false);
     }
@@ -38,24 +38,17 @@ export default function Dashboard() {
     setStreak(await post<Streak>("/activity", { activity_type: type }));
   }
 
-  async function generate() {
-    setGenerating(true);
-    setError(null);
-    try {
-      setPlan(await post<Plan>("/generate-plan", { available_hours: hours }));
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setGenerating(false);
-    }
-  }
-
   if (loading) return <p className="text-sm text-zinc-400">Loading…</p>;
 
-  const today = DAY_NAMES[(new Date().getDay() + 6) % 7];
-  const todayFocus = plan?.generated_json.daily_breakdown?.find(
-    (d) => d.day.toLowerCase().startsWith(today.toLowerCase())
-  );
+  // First in-progress node per pillar, else first not-started one.
+  const upNext = (Object.keys(ROADMAPS) as Pillar[]).map((pillar) => {
+    const nodes = allNodes(ROADMAPS[pillar]);
+    const node =
+      nodes.find((n) => progress[n.slug] === "in_progress") ??
+      nodes.find((n) => (progress[n.slug] ?? "not_started") === "not_started");
+    const done = nodes.filter((n) => progress[n.slug] === "done").length;
+    return { pillar, node, done, total: nodes.length };
+  });
 
   return (
     <div className="space-y-6">
@@ -74,23 +67,38 @@ export default function Dashboard() {
         )}
       </header>
 
-      {error && (
-        <p className="rounded-lg bg-rose-50 p-3 text-sm text-rose-700 dark:bg-rose-950 dark:text-rose-300">
-          {error}
-        </p>
-      )}
-
-      {todayFocus && (
-        <section className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-900 dark:bg-indigo-950/50">
-          <h2 className="mb-1 text-xs font-semibold tracking-wide text-indigo-500 uppercase">
-            {today}&apos;s focus
-          </h2>
-          <p className="text-sm font-medium">
-            {todayFocus.focus}{" "}
-            <span className="font-normal text-zinc-500">(~{todayFocus.est_hours}h)</span>
-          </p>
-        </section>
-      )}
+      <section>
+        <h2 className="mb-2 text-xs font-semibold tracking-wide text-zinc-400 uppercase">
+          Up next
+        </h2>
+        <div className="space-y-2">
+          {upNext.map(({ pillar, node, done, total }) => (
+            <Link
+              key={pillar}
+              href={
+                node
+                  ? `/roadmap/${pillarToSlug(pillar)}/${node.slug}`
+                  : `/roadmap/${pillarToSlug(pillar)}`
+              }
+              className="flex items-center gap-3 rounded-xl border border-zinc-200 px-4 py-3 transition hover:border-indigo-400 dark:border-zinc-800"
+            >
+              <span className="text-xl">{PILLAR_ICONS[pillar]}</span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-xs text-zinc-400">
+                  {PILLAR_LABELS[pillar]} · {done}/{total}
+                </span>
+                <span className="block truncate text-sm font-semibold">
+                  {node ? node.title : "All done 🎉"}
+                </span>
+                {node && progress[node.slug] === "in_progress" && (
+                  <span className="text-xs text-blue-500">continue →</span>
+                )}
+              </span>
+              <span className="text-zinc-300">→</span>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <section>
         <h2 className="mb-2 text-xs font-semibold tracking-wide text-zinc-400 uppercase">
@@ -113,42 +121,9 @@ export default function Dashboard() {
             </button>
           ))}
         </div>
-      </section>
-
-      <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-semibold">This week&apos;s plan</h2>
-          {plan && (
-            <span className="text-xs text-zinc-400">
-              wk of {plan.week_start_date}
-            </span>
-          )}
-        </div>
-        {plan ? (
-          <PlanCard plan={plan.generated_json} />
-        ) : (
-          <p className="mb-3 text-sm text-zinc-500">
-            No plan yet for this week. How many hours do you have?
-          </p>
-        )}
-        <div className="mt-4 flex items-center gap-2 border-t border-zinc-100 pt-4 dark:border-zinc-900">
-          <input
-            type="number"
-            min={1}
-            max={80}
-            value={hours}
-            onChange={(e) => setHours(Number(e.target.value))}
-            className="w-20 rounded-lg border border-zinc-300 px-2 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-          />
-          <span className="text-sm text-zinc-500">hrs/week</span>
-          <button
-            onClick={generate}
-            disabled={generating}
-            className="ml-auto rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50"
-          >
-            {generating ? "Generating…" : plan ? "Regenerate" : "Generate plan"}
-          </button>
-        </div>
+        <p className="mt-2 text-center text-xs text-zinc-400">
+          Marking roadmap topics and DSA problems logs activity automatically.
+        </p>
       </section>
     </div>
   );

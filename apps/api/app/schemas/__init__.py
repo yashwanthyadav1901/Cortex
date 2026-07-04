@@ -1,6 +1,5 @@
 import uuid
 from datetime import date, datetime
-from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
@@ -116,16 +115,16 @@ class StreakOut(BaseModel):
     active_today: bool
 
 
-# ---- Plans ----
+# ---- Roadmap progress ----
 
-class PlanGenerateRequest(BaseModel):
-    available_hours: int
+class ProgressUpdate(BaseModel):
+    pillar: Pillar
+    name: str
+    status: TopicStatus
 
 
-class PlanOut(_OrmModel):
-    id: uuid.UUID
-    week_start_date: date
-    available_hours: int
-    generated_json: dict[str, Any]
-    model: str | None
-    created_at: datetime
+class ProgressTopicOut(_OrmModel):
+    slug: str
+    pillar: Pillar
+    name: str
+    status: TopicStatus

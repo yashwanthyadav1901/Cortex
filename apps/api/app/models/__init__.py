@@ -47,7 +47,6 @@ class ActivityType(str, enum.Enum):
 
 from app.models.activity import DailyActivityLog  # noqa: E402
 from app.models.dsa_problem import DsaProblem  # noqa: E402
-from app.models.plan import Plan  # noqa: E402
 from app.models.project import Project  # noqa: E402
 from app.models.topic import Topic  # noqa: E402
 
@@ -63,5 +62,4 @@ __all__ = [
     "Project",
     "DsaProblem",
     "DailyActivityLog",
-    "Plan",
 ]

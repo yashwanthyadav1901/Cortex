@@ -1,0 +1,168 @@
+import type { ProjectSpec } from "../types";
+
+export const dsaProjects: ProjectSpec[] = [
+  {
+    slug: "ds-library",
+    pillar: "dsa",
+    title: "Data Structures Library from Scratch",
+    tagline: "Implement the core structures you'll use everywhere — no stdlib shortcuts.",
+    difficulty: "easy",
+    estHours: 15,
+    overview:
+      "Build your own versions of the fundamental data structures: dynamic array, hash map (with collision handling), linked list, stack, queue, min-heap, and BST. Each comes with unit tests and documented big-O guarantees. Writing them once from nothing converts 'I know how a hash map works' from a claim into a fact — and the muscle memory pays off in every interview where you must reason about internals.",
+    buildSteps: [
+      "Dynamic array with amortized O(1) append (manual resize logic, no built-in list growth)",
+      "Singly + doubly linked list with insert/delete/reverse and full test coverage",
+      "Hash map with separate chaining, then rewrite with open addressing; benchmark both under load factor sweeps",
+      "Stack and queue built on your own primitives; add a ring-buffer deque",
+      "Binary min-heap with heapify-up/down; expose a priority-queue interface",
+      "BST with insert/search/delete and in-order iterator; document worst-case vs average complexity",
+    ],
+    stretchGoals: [
+      "Add a self-balancing tree (AVL rotations) and benchmark against the plain BST on sorted input",
+      "Property-based tests (Hypothesis/fast-check) comparing your structures against built-ins",
+      "Write a README table of measured vs theoretical complexities",
+    ],
+    skills: ["memory layout intuition", "amortized analysis", "unit testing", "API design"],
+    topicSlugs: ["arrays-strings", "hashing", "linked-lists", "heaps", "bst", "sorting"],
+  },
+  {
+    slug: "lru-lfu-cache",
+    pillar: "dsa",
+    title: "LRU + LFU Cache",
+    tagline: "The classic hard interview question, built and benchmarked for real.",
+    difficulty: "medium",
+    estHours: 8,
+    overview:
+      "Implement an LRU cache with O(1) get/put using a hash map + doubly linked list, then level up to LFU with O(1) operations using frequency buckets. Wrap it in a small TTL-aware caching layer you could actually drop into a service. LRU is a top-5 most-asked interview problem, and building LFU after it teaches you how to compose structures to hit complexity targets that seem impossible at first glance.",
+    buildSteps: [
+      "LRU: hash map pointing into a doubly linked list; evict from tail, promote on access — all O(1)",
+      "Test suite covering capacity-1 edge cases, update-existing-key, and eviction order",
+      "LFU: frequency-bucket design (hash map of doubly linked lists) with O(1) get/put/evict",
+      "Add TTL expiry with lazy deletion on read",
+      "Benchmark hit rates of LRU vs LFU on a Zipfian access trace you generate",
+    ],
+    stretchGoals: [
+      "Thread-safe version with a lock, then benchmark lock contention",
+      "Implement segmented LRU (as used by real caches like Caffeine)",
+    ],
+    skills: ["pointer manipulation", "composing data structures", "cache eviction theory", "benchmarking"],
+    topicSlugs: ["hashing", "linked-lists", "caching"],
+  },
+  {
+    slug: "trie-autocomplete",
+    pillar: "dsa",
+    title: "Autocomplete Service with Tries",
+    tagline: "Type-ahead search backed by your own prefix tree, served over an API.",
+    difficulty: "medium",
+    estHours: 10,
+    overview:
+      "Build a trie-backed autocomplete engine: load a corpus (e.g., movie titles or Wikipedia article names), support prefix queries returning the top-K most popular completions, and serve it via a small FastAPI endpoint with sub-10ms responses. This is a DSA structure meeting a real product feature — the same design underlies search boxes at Google/Amazon scale, and it doubles as a system design case study you've actually built.",
+    buildSteps: [
+      "Core trie with insert and prefix-walk; load a 100K+ term corpus with frequency counts",
+      "Top-K completions per prefix: first by DFS + heap at query time",
+      "Optimize: precompute and cache top-K at each node; measure the speedup",
+      "Expose GET /suggest?q= via FastAPI; add latency logging",
+      "Handle case folding and basic unicode normalization",
+    ],
+    stretchGoals: [
+      "Fuzzy matching within edit distance 1 (delete/transpose variants)",
+      "Compress with a radix tree and compare memory usage",
+      "Persist the trie to disk and memory-map it on startup",
+    ],
+    skills: ["tries", "top-K with heaps", "API latency optimization", "memory trade-offs"],
+    topicSlugs: ["tries", "heaps", "design-autocomplete"],
+  },
+  {
+    slug: "pathfinding-visualizer",
+    pillar: "dsa",
+    title: "Pathfinding Visualizer",
+    tagline: "Watch BFS, Dijkstra, and A* race across a grid you can draw walls on.",
+    difficulty: "medium",
+    estHours: 12,
+    overview:
+      "A web app where you draw a grid maze and watch algorithms explore it step-by-step: BFS, DFS, Dijkstra with weighted cells, and A* with different heuristics. Animating the frontier makes graph algorithms visceral in a way LeetCode never does — you will never again forget why BFS guarantees shortest paths or how A*'s heuristic prunes the search. Also a genuinely fun portfolio piece.",
+    buildSteps: [
+      "Grid component with click-drag wall drawing and start/end placement (React + canvas or divs)",
+      "BFS and DFS with animated frontier/visited/path states",
+      "Weighted cells + Dijkstra using your own priority queue",
+      "A* with Manhattan distance; toggle heuristics and compare visited-node counts live",
+      "Maze generation (recursive division) for one-click interesting inputs",
+    ],
+    stretchGoals: [
+      "Bidirectional BFS and greedy best-first for comparison",
+      "Step-through mode with an explanation panel of the current algorithm state",
+    ],
+    skills: ["graph traversal", "priority queues", "React state/animation", "algorithm intuition"],
+    topicSlugs: ["graph-basics-bfs-dfs", "shortest-paths", "heaps"],
+  },
+  {
+    slug: "mini-regex",
+    pillar: "dsa",
+    title: "Mini Regex Engine",
+    tagline: "Support . * + ? and character classes — recursion and DP in their natural habitat.",
+    difficulty: "hard",
+    estHours: 12,
+    overview:
+      "Write a regex matcher supporting literals, '.', '*', '+', '?', anchors, and character classes — first with recursive backtracking, then with dynamic programming, and finally (stretch) by compiling to an NFA. 'Regular Expression Matching' is LeetCode hard #10; building the full engine makes that entire problem family trivial and gives you a deep story about backtracking blowups (catastrophic backtracking is a real production incident class).",
+    buildSteps: [
+      "Recursive backtracking matcher for literals, '.', and '*' (mirror LeetCode 10 semantics)",
+      "Add '+', '?', '^'/'$' anchors, and [a-z] character classes",
+      "Construct a pathological input demonstrating exponential backtracking; measure it",
+      "Reimplement the core match as bottom-up 2-D DP; benchmark against the backtracker",
+      "Test suite mirroring a subset of Python's re behavior on 100+ cases",
+    ],
+    stretchGoals: [
+      "Thompson NFA construction with linear-time simulation (the Russ Cox approach)",
+      "Capture groups",
+    ],
+    skills: ["recursion", "2-D DP", "parsing", "complexity analysis"],
+    topicSlugs: ["recursion", "backtracking", "dp-2d", "string-algorithms"],
+  },
+  {
+    slug: "json-parser",
+    pillar: "dsa",
+    title: "JSON Parser from Scratch",
+    tagline: "Tokenizer + recursive-descent parser for the full JSON spec.",
+    difficulty: "medium",
+    estHours: 8,
+    overview:
+      "Build a complete JSON parser: a tokenizer that streams lexemes and a recursive-descent parser that produces native objects, with precise error messages (line/column) on malformed input. Parsing is the most common 'real engineering' interview theme (stacks + recursion + state machines), and after this, nested-structure problems and 'implement X language feature' questions feel routine.",
+    buildSteps: [
+      "Tokenizer: strings (with escapes/unicode), numbers (exponents), literals, punctuation",
+      "Recursive-descent parser for values/objects/arrays with proper nesting via the call stack",
+      "Error reporting with line/column and expected-token messages",
+      "Pass the JSONTestSuite corpus (y_/n_ files) — fix every failure",
+      "Add a streaming mode that parses without loading the whole input",
+    ],
+    stretchGoals: [
+      "Pretty-printer (the reverse direction) with configurable indentation",
+      "Benchmark against the stdlib parser and profile your hot spots",
+    ],
+    skills: ["lexing/parsing", "recursion", "state machines", "spec compliance testing"],
+    topicSlugs: ["stack", "recursion"],
+  },
+  {
+    slug: "rate-limiter-lib",
+    pillar: "dsa",
+    title: "Rate Limiter Library",
+    tagline: "Token bucket, sliding window log, and sliding window counter — tested under load.",
+    difficulty: "medium",
+    estHours: 8,
+    overview:
+      "Implement the three classic rate-limiting algorithms as a clean library: token bucket, sliding window log (with a deque), and sliding window counter. Verify each one's guarantees with simulated traffic bursts and plot allowed-vs-rejected over time. This sits exactly on the DSA/system-design boundary: the algorithms are pure data-structure work, and the artifact is something you'll reuse in the system-design rate-limiter service project.",
+    buildSteps: [
+      "Token bucket with configurable rate/burst; property tests for exact refill math",
+      "Sliding window log using a deque of timestamps; measure memory under sustained load",
+      "Sliding window counter (two-bucket interpolation) and document its approximation error",
+      "Burst simulation harness: fire traffic patterns, plot allow/deny decisions per algorithm",
+      "Package as a library with a decorator/middleware interface",
+    ],
+    stretchGoals: [
+      "Distributed variant backed by Redis with atomic Lua scripts",
+      "Compare fairness across concurrent clients",
+    ],
+    skills: ["queues/deques", "time-based algorithms", "property testing", "library API design"],
+    topicSlugs: ["queue-deque", "heaps", "rate-limiting"],
+  },
+];

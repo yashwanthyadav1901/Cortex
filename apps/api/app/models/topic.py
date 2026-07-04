@@ -17,6 +17,7 @@ class Topic(Base):
     )
     pillar: Mapped[Pillar] = mapped_column(Enum(Pillar, name="pillar"), nullable=False)
     name: Mapped[str] = mapped_column(nullable=False)
+    slug: Mapped[str | None] = mapped_column(unique=True)  # roadmap node id
     status: Mapped[TopicStatus] = mapped_column(
         Enum(TopicStatus, name="topic_status"),
         nullable=False,

@@ -1,14 +1,15 @@
 # Cortex
 
-Personal learning-ops app: generates a personalized weekly study plan across three
-pillars — **System Design**, **AI**, and **DSA** — tracks progress, suggests projects,
-and keeps you consistent with a streak system.
+Personal learning-ops app for three pillars — **System Design**, **AI**, and **DSA**.
+Curated roadmap flowcharts with deep-dive topics (vetted resources + linked projects),
+a project catalog with detailed build specs, a DSA problem tracker, and a streak system.
 
 ## Structure
 
 ```
 apps/api   FastAPI backend (SQLAlchemy + Alembic → Supabase Postgres)
 apps/web   Next.js frontend (App Router, TypeScript, Tailwind, PWA)
+           └── src/content/   curated roadmaps & project specs (edit freely)
 ```
 
 ## Setup
@@ -17,8 +18,8 @@ apps/web   Next.js frontend (App Router, TypeScript, Tailwind, PWA)
 
 ```bash
 cd apps/api
-uv sync                      # or: python -m venv .venv && pip install -e .
-cp .env.example .env         # fill in DATABASE_URL, SUPABASE_JWT_SECRET, LLM_* vars
+uv venv && uv pip install -e .
+cp .env.example .env         # fill in DATABASE_URL, SUPABASE_URL, ALLOWED_EMAIL
 uv run alembic upgrade head  # apply schema to Supabase
 uv run uvicorn app.main:app --reload --port 8000
 ```
@@ -27,6 +28,7 @@ uv run uvicorn app.main:app --reload --port 8000
 
 ```bash
 cd apps/web
+nvm use            # needs Node 22 (.nvmrc)
 npm install
 cp .env.local.example .env.local   # fill in API URL + Supabase project keys
 npm run dev                        # http://localhost:3000
@@ -36,12 +38,21 @@ npm run dev                        # http://localhost:3000
 
 | App | Var | What |
 |---|---|---|
-| api | `DATABASE_URL` | Supabase direct connection string (port 5432 locally; pooler 6543 when deployed) |
-| api | `SUPABASE_JWT_SECRET` | Project Settings → API → JWT Secret (verifies login tokens) |
-| api | `ALLOWED_EMAIL` | Your email — the only account allowed through auth |
-| api | `LLM_BASE_URL` | OpenAI-compatible endpoint. Dev: `https://integrate.api.nvidia.com/v1` |
-| api | `LLM_API_KEY` | NVIDIA API key (build.nvidia.com) — swap for another provider later |
-| api | `LLM_MODEL` | Model id, e.g. `meta/llama-3.3-70b-instruct` |
+| api | `DATABASE_URL` | Supabase connection string (direct 5432, or session pooler if IPv6 fails) |
+| api | `SUPABASE_URL` | Project URL — verifies login tokens via JWKS (ES256 signing keys) |
+| api | `SUPABASE_JWT_SECRET` | Only for legacy HS256 projects; leave empty otherwise |
+| api | `ALLOWED_EMAIL` | The only account allowed through auth |
+| api | `CORS_ORIGINS` | Comma-separated allowed origins |
 | web | `NEXT_PUBLIC_API_URL` | FastAPI base URL, e.g. `http://localhost:8000` |
-| web | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (for auth) |
-| web | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (for auth) |
+| web | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (auth) |
+| web | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (auth) |
+
+## Editing the roadmaps
+
+All curated content lives in `apps/web/src/content/`:
+
+- `roadmaps/{dsa,system-design,ai}.ts` — stages → topic nodes (summary, why, resources)
+- `projects/{dsa,system-design,ai}.ts` — project specs (overview, milestones, stretch goals)
+
+Node `slug`s are stable IDs — progress in the DB is keyed on them, so don't rename
+a slug once you've started tracking it (edit titles/resources freely).
