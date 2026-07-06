@@ -34,6 +34,8 @@ def list_projects(status: ProjectStatus | None = None, db: Session = Depends(get
 def create_project(body: ProjectCreate, db: Session = Depends(get_db)):
     project = Project(**body.model_dump())
     db.add(project)
+    if project.status in (ProjectStatus.in_progress, ProjectStatus.done):
+        log_activity(db, ActivityType.project_work, topic_id=project.topic_id)
     db.commit()
     return project
 

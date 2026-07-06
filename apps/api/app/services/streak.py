@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models import DailyActivityLog
 from app.schemas import StreakOut
+from app.utils import local_today
 
 
 def compute_streak(db: Session, today: date | None = None) -> StreakOut:
@@ -13,7 +14,7 @@ def compute_streak(db: Session, today: date | None = None) -> StreakOut:
     Today counts if active, but a quiet today doesn't break the streak —
     it isn't over until the day ends.
     """
-    today = today or date.today()
+    today = today or local_today()
     days = db.scalars(
         select(DailyActivityLog.activity_date)
         .distinct()

@@ -5,6 +5,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from app.models import ActivityType, DailyActivityLog
+from app.utils import local_today
 
 
 def log_activity(
@@ -18,7 +19,7 @@ def log_activity(
     db.execute(
         insert(DailyActivityLog)
         .values(
-            activity_date=activity_date or date.today(),
+            activity_date=activity_date or local_today(),
             activity_type=activity_type,
             topic_id=topic_id,
             dsa_problem_id=dsa_problem_id,

@@ -15,12 +15,17 @@ router = APIRouter(
 
 
 @router.get("")
-def get_progress(db: Session = Depends(get_db)) -> dict[str, TopicStatus]:
-    """Status of every roadmap-linked topic, keyed by node slug."""
+def get_progress(
+    db: Session = Depends(get_db),
+) -> dict[str, dict[str, str | None]]:
+    """Status and notes of every roadmap-linked topic, keyed by node slug."""
     rows = db.execute(
-        select(Topic.slug, Topic.status).where(Topic.slug.is_not(None))
+        select(Topic.slug, Topic.status, Topic.notes).where(Topic.slug.is_not(None))
     ).all()
-    return {slug: status for slug, status in rows}
+    return {
+        slug: {"status": status.value, "notes": notes}
+        for slug, status, notes in rows
+    }
 
 
 @router.put("/{slug}", response_model=ProgressTopicOut)
@@ -29,10 +34,16 @@ def set_progress(slug: str, body: ProgressUpdate, db: Session = Depends(get_db))
     previous = db.scalar(select(Topic.status).where(Topic.slug == slug))
     db.execute(
         insert(Topic)
-        .values(slug=slug, pillar=body.pillar, name=body.name, status=body.status)
+        .values(
+            slug=slug,
+            pillar=body.pillar,
+            name=body.name,
+            status=body.status,
+            notes=body.notes,
+        )
         .on_conflict_do_update(
             index_elements=[Topic.slug],
-            set_={"status": body.status, "name": body.name},
+            set_={"status": body.status, "name": body.name, "notes": body.notes},
         )
     )
     topic = db.scalars(select(Topic).where(Topic.slug == slug)).one()

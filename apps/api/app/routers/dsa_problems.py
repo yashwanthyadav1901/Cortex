@@ -1,5 +1,4 @@
 import uuid
-from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -10,6 +9,7 @@ from app.db import get_db
 from app.models import ActivityType, Difficulty, DsaProblem, ProblemStatus
 from app.schemas import DsaProblemCreate, DsaProblemOut, DsaProblemUpdate
 from app.services.activity import log_activity
+from app.utils import local_today
 
 router = APIRouter(
     prefix="/dsa-problems", tags=["dsa"], dependencies=[Depends(require_user)]
@@ -58,11 +58,19 @@ def update_problem(
         updates.get("status") == ProblemStatus.solved
         and problem.status != ProblemStatus.solved
     )
+    # "status" in updates, not .get(): a title-only PATCH must keep the date
+    newly_unsolved = (
+        "status" in updates
+        and updates["status"] != ProblemStatus.solved
+        and problem.status == ProblemStatus.solved
+    )
     for field, value in updates.items():
         setattr(problem, field, value)
     if newly_solved:
-        problem.date_solved = date.today()
+        problem.date_solved = local_today()
         log_activity(db, ActivityType.dsa_solved, dsa_problem_id=problem.id)
+    elif newly_unsolved:
+        problem.date_solved = None
     db.commit()
     return problem
 

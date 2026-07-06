@@ -1,5 +1,6 @@
 import uuid
 from datetime import date, datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
@@ -121,6 +122,7 @@ class ProgressUpdate(BaseModel):
     pillar: Pillar
     name: str
     status: TopicStatus
+    notes: str | None = None
 
 
 class ProgressTopicOut(_OrmModel):
@@ -128,3 +130,24 @@ class ProgressTopicOut(_OrmModel):
     pillar: Pillar
     name: str
     status: TopicStatus
+    notes: str | None
+
+
+# ---- AI topic chat ----
+
+class ChatMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str
+
+
+class ChatTopic(BaseModel):
+    pillar: str
+    title: str
+    summary: str | None = None
+    why: str | None = None
+    tasks: list[str] = []
+
+
+class ChatRequest(BaseModel):
+    topic: ChatTopic | None = None
+    messages: list[ChatMessage]  # full history; last item is the new user question

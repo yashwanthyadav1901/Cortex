@@ -13,6 +13,7 @@ class Pillar(str, enum.Enum):
     system_design = "system_design"
     ai = "ai"
     dsa = "dsa"
+    ai_agents = "ai_agents"
 
 
 class TopicStatus(str, enum.Enum):
