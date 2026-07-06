@@ -14,6 +14,9 @@ dependencies = [
     "pyjwt[crypto]>=2.10",
     "certifi",
     "python-dateutil>=2.9",
+    "tzdata",  # IANA tz database for zoneinfo on systems without one
+    "openai>=1.0",  # client for NVIDIA's OpenAI-compatible endpoint (dev chat)
+    "anthropic>=0.40",  # Claude chat provider (prod)
 ]
 
 [tool.setuptools]

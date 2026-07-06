@@ -43,6 +43,7 @@ npm run dev                        # http://localhost:3000
 | api | `SUPABASE_JWT_SECRET` | Only for legacy HS256 projects; leave empty otherwise |
 | api | `ALLOWED_EMAIL` | The only account allowed through auth |
 | api | `CORS_ORIGINS` | Comma-separated allowed origins |
+| api | `TIMEZONE` | IANA name (e.g. `Asia/Kolkata`) anchoring streak day boundaries; defaults to UTC |
 | web | `NEXT_PUBLIC_API_URL` | FastAPI base URL, e.g. `http://localhost:8000` |
 | web | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (auth) |
 | web | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (auth) |

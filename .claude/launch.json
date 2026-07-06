@@ -2,11 +2,21 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "cortex-api",
+      "cwd": "apps/api",
+      "runtimeExecutable": "/Users/yashwanth/.local/bin/uv",
+      "runtimeArgs": ["run", "uvicorn", "app.main:app", "--port", "8000"],
+      "port": 8000
+    },
+    {
       "name": "cortex-web",
       "cwd": "apps/web",
       "runtimeExecutable": "/Users/yashwanth/.nvm/versions/node/v22.18.0/bin/npm",
       "runtimeArgs": ["run", "dev"],
-      "port": 3000
+      "port": 3000,
+      "env": {
+        "PATH": "/Users/yashwanth/.nvm/versions/node/v22.18.0/bin:/usr/bin:/bin"
+      }
     }
   ]
 }

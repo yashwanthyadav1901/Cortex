@@ -4,6 +4,7 @@ app/auth.py
 app/config.py
 app/db.py
 app/main.py
+app/utils.py
 cortex_api.egg-info/PKG-INFO
 cortex_api.egg-info/SOURCES.txt
 cortex_api.egg-info/dependency_links.txt

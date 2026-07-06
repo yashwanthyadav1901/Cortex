@@ -5,6 +5,7 @@ psycopg2-binary>=2.9
 alembic>=1.13
 pydantic>=2.7
 pydantic-settings>=2.3
-openai>=1.40
-pyjwt>=2.8
+pyjwt[crypto]>=2.10
+certifi
 python-dateutil>=2.9
+tzdata
