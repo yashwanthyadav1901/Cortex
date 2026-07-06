@@ -1,4 +1,4 @@
-export type Pillar = "system_design" | "ai" | "dsa";
+export type Pillar = "system_design" | "ai" | "dsa" | "ai_agents";
 export type TopicStatus = "not_started" | "in_progress" | "done";
 export type Difficulty = "easy" | "medium" | "hard";
 export type ProjectStatus = "suggested" | "in_progress" | "done";
@@ -35,6 +35,11 @@ export interface DsaProblem {
   url: string | null;
   date_solved: string | null;
   created_at: string;
+}
+
+export interface TopicProgress {
+  status: TopicStatus;
+  notes: string | null;
 }
 
 export interface Streak {

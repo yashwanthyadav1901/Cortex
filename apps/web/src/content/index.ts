@@ -1,7 +1,9 @@
 import type { Pillar } from "@/types";
+import { aiAgentsProjects } from "./projects/ai-agents";
 import { aiProjects } from "./projects/ai";
 import { dsaProjects } from "./projects/dsa";
 import { systemDesignProjects } from "./projects/system-design";
+import { aiAgentsRoadmap } from "./roadmaps/ai-agents";
 import { aiRoadmap } from "./roadmaps/ai";
 import { dsaRoadmap } from "./roadmaps/dsa";
 import { systemDesignRoadmap } from "./roadmaps/system-design";
@@ -11,18 +13,21 @@ export const ROADMAPS: Record<Pillar, Roadmap> = {
   system_design: systemDesignRoadmap,
   ai: aiRoadmap,
   dsa: dsaRoadmap,
+  ai_agents: aiAgentsRoadmap,
 };
 
 export const PROJECTS: ProjectSpec[] = [
   ...systemDesignProjects,
   ...aiProjects,
   ...dsaProjects,
+  ...aiAgentsProjects,
 ];
 
 export const PILLAR_LABELS: Record<Pillar, string> = {
   system_design: "System Design",
   ai: "AI",
   dsa: "DSA",
+  ai_agents: "AI Agents",
 };
 
 /** URL segment ↔ pillar mapping (pillar enum uses underscores). */
@@ -30,10 +35,11 @@ export const PILLAR_SLUGS: Record<string, Pillar> = {
   "system-design": "system_design",
   ai: "ai",
   dsa: "dsa",
+  "ai-agents": "ai_agents",
 };
 
 export function pillarToSlug(pillar: Pillar): string {
-  return pillar === "system_design" ? "system-design" : pillar;
+  return pillar.replace(/_/g, "-");
 }
 
 export function getProject(slug: string): ProjectSpec | undefined {

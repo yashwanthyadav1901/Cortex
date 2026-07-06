@@ -4,10 +4,11 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import StatusPill from "@/components/ui/StatusPill";
+import TopicChat from "@/components/TopicChat";
 import { findNode, PILLAR_SLUGS, projectsForNode } from "@/content";
 import type { ResourceType } from "@/content/types";
 import { get, put } from "@/lib/api";
-import type { TopicStatus } from "@/types";
+import type { DsaProblem, TopicProgress, TopicStatus } from "@/types";
 
 const RESOURCE_ICONS: Record<ResourceType, string> = {
   video: "▶️",
@@ -24,18 +25,63 @@ const STATUS_OPTIONS: { value: TopicStatus; label: string }[] = [
   { value: "done", label: "Done" },
 ];
 
+function useTaskChecks(slug: string, count: number) {
+  const key = `cortex:tasks:${slug}`;
+  const [checks, setChecks] = useState<boolean[]>(() => {
+    if (typeof window === "undefined") return Array(count).fill(false);
+    try {
+      const stored = JSON.parse(localStorage.getItem(key) ?? "[]");
+      if (Array.isArray(stored) && stored.length === count) return stored;
+    } catch {}
+    return Array(count).fill(false);
+  });
+
+  function toggle(i: number) {
+    setChecks((prev) => {
+      const next = [...prev];
+      next[i] = !next[i];
+      localStorage.setItem(key, JSON.stringify(next));
+      return next;
+    });
+  }
+
+  return { checks, toggle, done: checks.filter(Boolean).length };
+}
+
 export default function TopicDetailPage() {
   const params = useParams<{ pillar: string; slug: string }>();
   const pillar = PILLAR_SLUGS[params.pillar];
   const found = pillar ? findNode(pillar, params.slug) : undefined;
   const [status, setStatus] = useState<TopicStatus>("not_started");
+  const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const [notesSaved, setNotesSaved] = useState(false);
+  const [notesError, setNotesError] = useState(false);
+
+  const [dsaProblems, setDsaProblems] = useState<DsaProblem[]>([]);
+
+  const tasks = found?.node.tasks ?? [];
+  const { checks, toggle, done: tasksDone } = useTaskChecks(
+    params.slug,
+    tasks.length
+  );
 
   useEffect(() => {
-    get<Record<string, TopicStatus>>("/progress").then((p) => {
-      if (p[params.slug]) setStatus(p[params.slug]);
-    });
-  }, [params.slug]);
+    get<Record<string, TopicProgress>>("/progress")
+      .then((p) => {
+        const entry = p[params.slug];
+        if (entry) {
+          setStatus(entry.status);
+          setNotes(entry.notes ?? "");
+        }
+      })
+      .catch(() => {});
+    if (params.pillar === "dsa") {
+      get<DsaProblem[]>(`/dsa-problems?topic_tag=${params.slug}`)
+        .then(setDsaProblems)
+        .catch(() => {});
+    }
+  }, [params.slug, params.pillar]);
 
   if (!pillar || !found) {
     return (
@@ -53,16 +99,37 @@ export default function TopicDetailPage() {
 
   async function updateStatus(next: TopicStatus) {
     if (!node) return;
+    const prev = status;
     setSaving(true);
-    setStatus(next); // optimistic
+    setStatus(next);
     try {
       await put(`/progress/${node.slug}`, {
         pillar,
         name: node.title,
         status: next,
+        notes: notes || null,
       });
+    } catch {
+      setStatus(prev);
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function saveNotes() {
+    if (!node) return;
+    try {
+      await put(`/progress/${node.slug}`, {
+        pillar,
+        name: node.title,
+        status,
+        notes: notes || null,
+      });
+      setNotesError(false);
+      setNotesSaved(true);
+      setTimeout(() => setNotesSaved(false), 1500);
+    } catch {
+      setNotesError(true);
     }
   }
 
@@ -107,6 +174,72 @@ export default function TopicDetailPage() {
         </p>
       </section>
 
+      {tasks.length > 0 && (
+        <section>
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-xs font-semibold tracking-wide text-zinc-400 uppercase">
+              Learning tasks
+            </h2>
+            <span className="text-xs text-zinc-400">
+              {tasksDone}/{tasks.length} done
+            </span>
+          </div>
+          <ul className="space-y-1.5">
+            {tasks.map((task, i) => (
+              <li key={i}>
+                <button
+                  onClick={() => toggle(i)}
+                  className="flex w-full items-start gap-3 rounded-lg px-2 py-2 text-left transition hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                >
+                  <span
+                    className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border text-xs transition ${
+                      checks[i]
+                        ? "border-emerald-500 bg-emerald-500 text-white"
+                        : "border-zinc-300 dark:border-zinc-600"
+                    }`}
+                  >
+                    {checks[i] && "✓"}
+                  </span>
+                  <span
+                    className={`text-sm leading-relaxed ${
+                      checks[i]
+                        ? "text-zinc-400 line-through dark:text-zinc-500"
+                        : "text-zinc-700 dark:text-zinc-300"
+                    }`}
+                  >
+                    {task}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section>
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-xs font-semibold tracking-wide text-zinc-400 uppercase">
+            Notes
+          </h2>
+          {notesSaved && (
+            <span className="text-xs text-emerald-500">Saved</span>
+          )}
+          {notesError && (
+            <span className="text-xs text-rose-500">Couldn&apos;t save</span>
+          )}
+        </div>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          onBlur={saveNotes}
+          placeholder="Write what you learned…"
+          className="w-full resize-y rounded-xl border border-zinc-200 bg-transparent px-4 py-3 text-sm leading-relaxed placeholder:text-zinc-400 focus:border-indigo-400 focus:outline-none dark:border-zinc-800"
+          style={{ minHeight: "120px" }}
+        />
+      </section>
+
+      <TopicChat pillar={pillar} node={node} trigger="floating" />
+
       <section>
         <h2 className="mb-2 text-xs font-semibold tracking-wide text-zinc-400 uppercase">
           Resources
@@ -134,6 +267,72 @@ export default function TopicDetailPage() {
           ))}
         </ul>
       </section>
+
+      {dsaProblems.length > 0 && (
+        <section>
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-xs font-semibold tracking-wide text-zinc-400 uppercase">
+              Practice problems
+            </h2>
+            <span className="text-xs text-zinc-400">
+              {dsaProblems.filter((p) => p.status === "solved").length}/
+              {dsaProblems.length} solved
+            </span>
+          </div>
+          <ul className="space-y-1.5">
+            {dsaProblems.map((p) => (
+              <li
+                key={p.id}
+                className="flex items-center gap-3 rounded-xl border border-zinc-200 px-4 py-3 dark:border-zinc-800"
+              >
+                <span
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold text-white ${
+                    p.status === "solved"
+                      ? "border-emerald-500 bg-emerald-500"
+                      : "border-zinc-300 dark:border-zinc-700"
+                  }`}
+                >
+                  {p.status === "solved" && "✓"}
+                </span>
+                <span className="min-w-0 flex-1">
+                  {p.url ? (
+                    <a
+                      href={p.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`block truncate text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400 ${
+                        p.status === "solved" ? "text-zinc-400 line-through" : ""
+                      }`}
+                    >
+                      {p.title} ↗
+                    </a>
+                  ) : (
+                    <span
+                      className={`block truncate text-sm font-medium ${
+                        p.status === "solved" ? "text-zinc-400 line-through" : ""
+                      }`}
+                    >
+                      {p.title}
+                    </span>
+                  )}
+                  {p.date_solved && (
+                    <span className="text-xs text-zinc-400">
+                      solved {p.date_solved}
+                    </span>
+                  )}
+                </span>
+                <StatusPill value={p.difficulty} />
+              </li>
+            ))}
+          </ul>
+          <Link
+            href="/dsa"
+            className="mt-2 block text-center text-xs text-indigo-500 hover:underline"
+          >
+            Manage in DSA Tracker →
+          </Link>
+        </section>
+      )}
 
       {projects.length > 0 && (
         <section>

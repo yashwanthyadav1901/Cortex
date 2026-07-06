@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { pillarToSlug } from "@/content";
 import type { Roadmap, RoadmapNode } from "@/content/types";
-import type { TopicStatus } from "@/types";
+import { get } from "@/lib/api";
+import type { DsaProblem, TopicProgress, TopicStatus } from "@/types";
 
-export type ProgressMap = Record<string, TopicStatus>;
+export type ProgressMap = Record<string, TopicProgress>;
 
 /** Group a stage's nodes: consecutive nodes sharing a `row` render side-by-side. */
 function groupRows(nodes: RoadmapNode[]): RoadmapNode[][] {
@@ -50,14 +52,67 @@ function Connector() {
   );
 }
 
+function useTaskCounts(nodes: RoadmapNode[]) {
+  const slugKey = useMemo(() => nodes.map((n) => n.slug).join(","), [nodes]);
+  const [counts, setCounts] = useState<Record<string, { done: number; total: number }>>({});
+
+  useEffect(() => {
+    const result: Record<string, { done: number; total: number }> = {};
+    for (const node of nodes) {
+      const tasks = node.tasks ?? [];
+      if (tasks.length === 0) continue;
+      try {
+        const stored = JSON.parse(
+          localStorage.getItem(`cortex:tasks:${node.slug}`) ?? "[]"
+        );
+        const done =
+          Array.isArray(stored) && stored.length === tasks.length
+            ? stored.filter(Boolean).length
+            : 0;
+        result[node.slug] = { done, total: tasks.length };
+      } catch {
+        result[node.slug] = { done: 0, total: tasks.length };
+      }
+    }
+    setCounts(result);
+  }, [slugKey]);
+
+  return counts;
+}
+
+function useDsaSolvedCounts(isDsa: boolean) {
+  const [counts, setCounts] = useState<Record<string, { solved: number; total: number }>>({});
+
+  useEffect(() => {
+    if (!isDsa) return;
+    get<DsaProblem[]>("/dsa-problems")
+      .then((problems) => {
+        const map: Record<string, { solved: number; total: number }> = {};
+        for (const p of problems) {
+          if (!map[p.topic_tag]) map[p.topic_tag] = { solved: 0, total: 0 };
+          map[p.topic_tag].total++;
+          if (p.status === "solved") map[p.topic_tag].solved++;
+        }
+        setCounts(map);
+      })
+      .catch(() => {});
+  }, [isDsa]);
+
+  return counts;
+}
+
 function NodeCard({
   node,
   pillarSlug,
   status,
+  taskCount,
+  solvedCount,
 }: {
   node: RoadmapNode;
   pillarSlug: string;
   status: TopicStatus;
+  taskCount?: { done: number; total: number };
+  solvedCount?: { solved: number; total: number };
 }) {
   const style = STATUS_STYLES[status];
   return (
@@ -77,6 +132,12 @@ function NodeCard({
           {node.projectSlugs?.length
             ? ` · ${node.projectSlugs.length} project${node.projectSlugs.length > 1 ? "s" : ""}`
             : ""}
+          {taskCount
+            ? ` · ${taskCount.done}/${taskCount.total} tasks`
+            : ""}
+          {solvedCount
+            ? ` · ${solvedCount.solved}/${solvedCount.total} solved`
+            : ""}
         </span>
       </span>
     </Link>
@@ -91,6 +152,10 @@ export default function RoadmapFlow({
   progress: ProgressMap;
 }) {
   const pillarSlug = pillarToSlug(roadmap.pillar);
+  const allNodes = roadmap.stages.flatMap((s) => s.nodes);
+  const taskCounts = useTaskCounts(allNodes);
+  const dsaCounts = useDsaSolvedCounts(roadmap.pillar === "dsa");
+
   return (
     <div>
       {roadmap.stages.map((stage, si) => (
@@ -110,7 +175,9 @@ export default function RoadmapFlow({
                     key={node.slug}
                     node={node}
                     pillarSlug={pillarSlug}
-                    status={progress[node.slug] ?? "not_started"}
+                    status={progress[node.slug]?.status ?? "not_started"}
+                    taskCount={taskCounts[node.slug]}
+                    solvedCount={dsaCounts[node.slug]}
                   />
                 ))}
               </div>

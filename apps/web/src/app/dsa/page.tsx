@@ -1,9 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import StatusPill from "@/components/ui/StatusPill";
+import { allNodes, ROADMAPS } from "@/content";
 import { del, get, patch, post } from "@/lib/api";
 import type { Difficulty, DsaProblem, ProblemStatus } from "@/types";
+
+const DSA_TOPICS = allNodes(ROADMAPS.dsa).map((n) => ({
+  slug: n.slug,
+  title: n.title,
+}));
 
 export default function DsaPage() {
   const [problems, setProblems] = useState<DsaProblem[]>([]);
@@ -11,44 +17,66 @@ export default function DsaPage() {
   const [filterDifficulty, setFilterDifficulty] = useState<Difficulty | "">("");
   const [filterStatus, setFilterStatus] = useState<ProblemStatus | "">("");
   const [title, setTitle] = useState("");
-  const [tag, setTag] = useState("");
+  const [url, setUrl] = useState("");
+  const [tag, setTag] = useState(DSA_TOPICS[0]?.slug ?? "");
+  const [customTag, setCustomTag] = useState("");
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
 
+  // Fetch everything once; filter client-side so the filter dropdowns
+  // always offer the full set of options.
   const load = useCallback(async () => {
-    const params = new URLSearchParams();
-    if (filterTag) params.set("topic_tag", filterTag);
-    if (filterDifficulty) params.set("difficulty", filterDifficulty);
-    if (filterStatus) params.set("status", filterStatus);
-    setProblems(await get<DsaProblem[]>(`/dsa-problems?${params}`));
-  }, [filterTag, filterDifficulty, filterStatus]);
+    setProblems(await get<DsaProblem[]>("/dsa-problems"));
+  }, []);
 
   useEffect(() => {
-    load();
+    load().catch(() => {});
   }, [load]);
+
+  const visible = useMemo(
+    () =>
+      problems.filter(
+        (p) =>
+          (!filterTag || p.topic_tag === filterTag) &&
+          (!filterDifficulty || p.difficulty === filterDifficulty) &&
+          (!filterStatus || p.status === filterStatus)
+      ),
+    [problems, filterTag, filterDifficulty, filterStatus]
+  );
 
   const allTags = [...new Set(problems.map((p) => p.topic_tag))].sort();
 
   async function addProblem(e: React.FormEvent) {
     e.preventDefault();
-    if (!title.trim() || !tag.trim()) return;
-    await post<DsaProblem>("/dsa-problems", {
-      title: title.trim(),
-      topic_tag: tag.trim().toLowerCase().replace(/\s+/g, "_"),
-      difficulty,
-    });
-    setTitle("");
-    load();
+    if (!title.trim()) return;
+    const resolvedTag = tag === "__other" ? customTag.trim() : tag;
+    if (!resolvedTag) return;
+    try {
+      await post<DsaProblem>("/dsa-problems", {
+        title: title.trim(),
+        topic_tag: resolvedTag.toLowerCase().replace(/\s+/g, "_"),
+        difficulty,
+        url: url.trim() || null,
+      });
+      setTitle("");
+      setUrl("");
+      setCustomTag("");
+      await load();
+    } catch {}
   }
 
   async function toggleSolved(problem: DsaProblem) {
     const status: ProblemStatus = problem.status === "solved" ? "todo" : "solved";
-    const updated = await patch<DsaProblem>(`/dsa-problems/${problem.id}`, { status });
-    setProblems((ps) => ps.map((p) => (p.id === problem.id ? updated : p)));
+    try {
+      const updated = await patch<DsaProblem>(`/dsa-problems/${problem.id}`, { status });
+      setProblems((ps) => ps.map((p) => (p.id === problem.id ? updated : p)));
+    } catch {}
   }
 
   async function remove(id: string) {
-    await del(`/dsa-problems/${id}`);
-    setProblems((ps) => ps.filter((p) => p.id !== id));
+    try {
+      await del(`/dsa-problems/${id}`);
+      setProblems((ps) => ps.filter((p) => p.id !== id));
+    } catch {}
   }
 
   return (
@@ -64,7 +92,7 @@ export default function DsaPage() {
           <option value="">All topics</option>
           {allTags.map((t) => (
             <option key={t} value={t}>
-              {t}
+              {DSA_TOPICS.find((d) => d.slug === t)?.title ?? t}
             </option>
           ))}
         </select>
@@ -91,7 +119,7 @@ export default function DsaPage() {
       </div>
 
       <ul className="divide-y divide-zinc-100 dark:divide-zinc-900">
-        {problems.map((p) => (
+        {visible.map((p) => (
           <li key={p.id} className="flex items-center gap-3 py-3">
             <button
               onClick={() => toggleSolved(p)}
@@ -105,15 +133,28 @@ export default function DsaPage() {
               {p.status === "solved" && "✓"}
             </button>
             <div className="min-w-0 flex-1">
-              <p
-                className={`truncate text-sm font-medium ${
-                  p.status === "solved" ? "text-zinc-400 line-through" : ""
-                }`}
-              >
-                {p.title}
-              </p>
+              {p.url ? (
+                <a
+                  href={p.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`truncate text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400 ${
+                    p.status === "solved" ? "text-zinc-400 line-through" : ""
+                  }`}
+                >
+                  {p.title} ↗
+                </a>
+              ) : (
+                <p
+                  className={`truncate text-sm font-medium ${
+                    p.status === "solved" ? "text-zinc-400 line-through" : ""
+                  }`}
+                >
+                  {p.title}
+                </p>
+              )}
               <p className="text-xs text-zinc-400">
-                {p.topic_tag}
+                {DSA_TOPICS.find((d) => d.slug === p.topic_tag)?.title ?? p.topic_tag}
                 {p.date_solved && ` · solved ${p.date_solved}`}
               </p>
             </div>
@@ -127,7 +168,7 @@ export default function DsaPage() {
             </button>
           </li>
         ))}
-        {problems.length === 0 && (
+        {visible.length === 0 && (
           <li className="py-8 text-center text-sm text-zinc-400">
             Nothing here — adjust filters or add a problem below.
           </li>
@@ -142,11 +183,32 @@ export default function DsaPage() {
           className="min-w-0 flex-1 basis-full rounded-lg border border-zinc-300 px-3 py-2 text-sm sm:basis-auto dark:border-zinc-700 dark:bg-zinc-900"
         />
         <input
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="leetcode.com/…"
+          type="url"
+          className="min-w-0 flex-1 basis-full rounded-lg border border-zinc-300 px-3 py-2 text-sm sm:basis-auto dark:border-zinc-700 dark:bg-zinc-900"
+        />
+        <select
           value={tag}
           onChange={(e) => setTag(e.target.value)}
-          placeholder="topic tag"
-          className="w-32 rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-        />
+          className="rounded-lg border border-zinc-300 px-2 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+        >
+          {DSA_TOPICS.map((t) => (
+            <option key={t.slug} value={t.slug}>
+              {t.title}
+            </option>
+          ))}
+          <option value="__other">Other…</option>
+        </select>
+        {tag === "__other" && (
+          <input
+            value={customTag}
+            onChange={(e) => setCustomTag(e.target.value)}
+            placeholder="custom tag"
+            className="w-32 rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          />
+        )}
         <select
           value={difficulty}
           onChange={(e) => setDifficulty(e.target.value as Difficulty)}

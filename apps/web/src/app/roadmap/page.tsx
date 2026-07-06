@@ -4,19 +4,22 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { allNodes, PILLAR_LABELS, pillarToSlug, ROADMAPS } from "@/content";
 import { get } from "@/lib/api";
-import type { Pillar, TopicStatus } from "@/types";
+import type { Pillar, TopicProgress } from "@/types";
 
 const PILLAR_ICONS: Record<Pillar, string> = {
   system_design: "🏗️",
   ai: "🤖",
   dsa: "🧩",
+  ai_agents: "🕵️",
 };
 
 export default function RoadmapIndex() {
-  const [progress, setProgress] = useState<Record<string, TopicStatus>>({});
+  const [progress, setProgress] = useState<Record<string, TopicProgress>>({});
 
   useEffect(() => {
-    get<Record<string, TopicStatus>>("/progress").then(setProgress);
+    get<Record<string, TopicProgress>>("/progress")
+      .then(setProgress)
+      .catch(() => {});
   }, []);
 
   return (
@@ -30,9 +33,9 @@ export default function RoadmapIndex() {
         {(Object.keys(ROADMAPS) as Pillar[]).map((pillar) => {
           const roadmap = ROADMAPS[pillar];
           const nodes = allNodes(roadmap);
-          const done = nodes.filter((n) => progress[n.slug] === "done").length;
+          const done = nodes.filter((n) => progress[n.slug]?.status === "done").length;
           const inProgress = nodes.filter(
-            (n) => progress[n.slug] === "in_progress"
+            (n) => progress[n.slug]?.status === "in_progress"
           ).length;
           const pct = nodes.length ? Math.round((done / nodes.length) * 100) : 0;
           return (

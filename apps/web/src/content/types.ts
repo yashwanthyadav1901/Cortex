@@ -26,6 +26,8 @@ export interface RoadmapNode {
   resources: Resource[];
   /** Slugs of ProjectSpecs that exercise this topic. */
   projectSlugs?: string[];
+  /** Concrete action items: read X, implement Y, explain Z. */
+  tasks?: string[];
   /** Nodes in the same stage with the same row render side-by-side. */
   row?: number;
 }

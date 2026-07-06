@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import ApiErrorToast from "@/components/ApiErrorToast";
 import AuthGuard from "@/components/AuthGuard";
 import BottomNav from "@/components/nav/BottomNav";
 import Sidebar from "@/components/nav/Sidebar";
@@ -36,6 +37,7 @@ export default function RootLayout({
             </main>
           </div>
           <BottomNav />
+          <ApiErrorToast />
         </AuthGuard>
       </body>
     </html>

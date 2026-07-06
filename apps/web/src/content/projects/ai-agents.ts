@@ -1,0 +1,151 @@
+import type { ProjectSpec } from "../types";
+
+export const aiAgentsProjects: ProjectSpec[] = [
+  {
+    slug: "enterprise-agent",
+    pillar: "ai_agents",
+    title: "Enterprise Agent from Scratch",
+    tagline: "The full agent loop with zero frameworks: tools, guardrails, structured logging, and evals.",
+    difficulty: "hard",
+    estHours: 15,
+    overview:
+      "Build a production-grade agent directly on the Claude API with no agent frameworks. Define a tool registry with 5+ tools (file operations, web fetch, database query, calculator, code executor), implement the ReAct loop with step budgets, add guardrails (confirmation gates for destructive actions, output validation, cost limits), structured logging of every decision, and an eval suite that measures task completion rate across 20 test scenarios. Writing every layer yourself teaches you exactly what frameworks hide — and what they get wrong.",
+    buildSteps: [
+      "Single-tool agent: Messages API + calculator tool, handle the tool_use → tool_result round-trip",
+      "Tool registry: define tools as schema + handler objects, dynamically build the tools array for each API call",
+      "Multi-step ReAct loop: reason → select tool → call → observe → loop, with a configurable max-step budget",
+      "Error handling: malformed tool calls, tool errors fed back to the model, retry logic with fallback to a simpler prompt",
+      "Guardrails: confirmation gate before write/delete tools, output content filtering, per-task cost ceiling",
+      "Structured logging: JSON log of every step (reasoning, tool selected, input, output, tokens used, latency)",
+      "Eval suite: 20 tasks with success criteria, automated runner, pass/fail report with cost-per-task breakdown",
+    ],
+    stretchGoals: [
+      "Streaming UI: display the agent's reasoning and tool calls in real-time via SSE",
+      "Fallback chain: if Claude fails, fall back to a local model via Ollama with the same tool interface",
+    ],
+    skills: ["tool calling", "agent loops", "guardrail design", "structured logging", "eval design"],
+    topicSlugs: [
+      "agent-tool-calling",
+      "agent-architectures",
+      "agent-guardrails-safety",
+      "agent-observability-eval",
+      "agent-deployment-scale",
+    ],
+  },
+  {
+    slug: "mcp-tool-server",
+    pillar: "ai_agents",
+    title: "Production MCP Server",
+    tagline: "Build a real MCP server exposing tools over stdio and HTTP — then connect it to Claude.",
+    difficulty: "medium",
+    estHours: 10,
+    overview:
+      "Implement a Model Context Protocol server that exposes tools from a real service (your Cortex API, a database, or a file system). Cover both stdio transport (for Claude Desktop) and streamable HTTP transport (for remote deployment). Add authentication, input validation, error handling, and write integration tests that verify the full protocol lifecycle. Finish by connecting your server to Claude Desktop and using it for real tasks.",
+    buildSteps: [
+      "Minimal MCP server in Python: 1 tool (echo), stdio transport, test with the MCP inspector",
+      "Add 3 real tools: query a database, read/write files, and call an external API — with proper JSON schemas",
+      "Add streamable HTTP transport alongside stdio — same tools, different transport layer",
+      "Authentication: require an API key for HTTP transport, validate on every request",
+      "Error handling: return proper MCP error responses for invalid inputs, missing tools, and server errors",
+      "Integration tests: automated tests that spin up the server, connect a client, and verify each tool works end-to-end",
+      "Connect to Claude Desktop: configure your server in Claude Desktop settings and use it for a real multi-step task",
+    ],
+    stretchGoals: [
+      "Add MCP resources: expose data (e.g., database schema, API docs) as resources the model can read",
+      "Deploy the HTTP server to a cloud provider with TLS and rate limiting",
+    ],
+    skills: ["MCP protocol", "server development", "transport layers", "integration testing"],
+    topicSlugs: [
+      "agent-mcp-protocol",
+      "agent-mcp-building",
+      "agent-tool-design",
+    ],
+  },
+  {
+    slug: "multi-agent-pipeline",
+    pillar: "ai_agents",
+    title: "Multi-Agent Pipeline with Human Oversight",
+    tagline: "Orchestrator + specialists + human approval gates — the enterprise multi-agent pattern.",
+    difficulty: "hard",
+    estHours: 12,
+    overview:
+      "Build a multi-agent system where a supervisor agent decomposes complex tasks and delegates to specialist agents (researcher, writer, reviewer). Implement both raw API orchestration and a LangGraph version for comparison. Add human-in-the-loop approval gates before high-stakes actions, streaming intermediate results so humans can monitor progress, and an audit trail logging every agent decision. The capstone exercise in agent coordination.",
+    buildSteps: [
+      "Two-agent handoff: supervisor delegates a subtask to a specialist, specialist returns results, supervisor synthesizes",
+      "Specialist registry: 3 specialist agents (researcher with web search, writer with file tools, reviewer with eval criteria)",
+      "Orchestration loop: supervisor plans subtasks, delegates in sequence, collects results, and produces final output",
+      "Human approval gate: before the writer commits output, present a preview to the human and wait for approval/revision",
+      "Streaming progress: display each agent's reasoning and actions in real-time via a simple web UI",
+      "Rebuild in LangGraph: implement the same pipeline as a state graph with conditional edges and checkpointing",
+      "Compare: measure both implementations on 5 complex tasks — success rate, total cost, and lines of code",
+    ],
+    stretchGoals: [
+      "Parallel delegation: supervisor dispatches independent subtasks concurrently and joins results",
+      "Memory sharing: agents build a shared knowledge graph during execution",
+    ],
+    skills: ["multi-agent orchestration", "human-in-the-loop", "LangGraph", "agent handoffs"],
+    topicSlugs: [
+      "agent-multi-agent-orchestration",
+      "agent-human-in-loop",
+      "agent-claude-sdk",
+      "agent-langgraph-crewai",
+    ],
+  },
+  {
+    slug: "agent-eval-suite",
+    pillar: "ai_agents",
+    title: "Agent Evaluation Suite",
+    tagline: "Task-based eval harness: define tasks, run agents, measure completion, grade with LLM-as-judge.",
+    difficulty: "medium",
+    estHours: 8,
+    overview:
+      "Build the testing infrastructure that production agent teams need: define evaluation tasks in YAML (input scenario, expected outcomes, success criteria), run agents against them, measure task completion rate, cost per task, and latency. Grade ambiguous outcomes with an LLM-as-judge evaluator. Generate diff reports when you change the agent's prompt or tools. Point it at your other agent projects and do a real improvement cycle.",
+    buildSteps: [
+      "YAML task format: input scenario, expected outcome, grader type (exact match, contains, LLM-judge)",
+      "Runner: execute each task against an agent, capture the full trajectory (every step), and record the final output",
+      "Graders: exact match, regex/contains, and LLM-as-judge with a rubric prompt — validate the judge on 15 hand-labeled cases",
+      "Metrics: compute pass rate, average cost, P50/P95 latency, and average steps-to-completion",
+      "Diff report: run the same tasks against two agent configurations (A vs B), show per-task improved/regressed/unchanged",
+      "Wire it up: evaluate one of your other projects (enterprise-agent or multi-agent-pipeline) and do one prompt improvement cycle guided by the results",
+    ],
+    stretchGoals: [
+      "Trajectory evaluation: grade not just the final output but each intermediate step",
+      "CI integration: run evals on every commit and fail the build if pass rate drops",
+    ],
+    skills: ["eval design", "LLM-as-judge", "test infrastructure", "agent improvement loops"],
+    topicSlugs: [
+      "agent-observability-eval",
+      "agent-guardrails-safety",
+      "agent-architectures",
+    ],
+  },
+  {
+    slug: "framework-comparison",
+    pillar: "ai_agents",
+    title: "Agent Framework Comparison",
+    tagline: "Build the same agent in raw API, LangGraph, and CrewAI — then benchmark honestly.",
+    difficulty: "medium",
+    estHours: 8,
+    overview:
+      "Pick a non-trivial agent task (e.g., 'research a topic and write a report with citations') and implement it three ways: raw Claude API, LangGraph, and CrewAI. For each implementation, measure lines of code, time to implement, task completion rate on 10 test inputs, total cost, and latency. Write a comparison report that captures the real trade-offs — not marketing claims. The goal is to build informed intuition about when frameworks help and when they get in the way.",
+    buildSteps: [
+      "Define the benchmark task and 10 test inputs with success criteria",
+      "Implementation 1: raw Claude API with tool calling and a ReAct loop",
+      "Implementation 2: LangGraph with state graph, tools, and conditional edges",
+      "Implementation 3: CrewAI with role-based agents, tasks, and tools",
+      "Run all 10 test inputs through each implementation, recording pass/fail, cost, latency, and any errors",
+      "Write the comparison report: quantitative metrics + qualitative notes on debugging experience, flexibility, and production readiness",
+    ],
+    stretchGoals: [
+      "Add a 4th implementation using the Claude Agent SDK",
+      "Load test: run 20 concurrent tasks through each framework and measure throughput",
+    ],
+    skills: ["framework evaluation", "benchmarking", "LangGraph", "CrewAI", "raw API patterns"],
+    topicSlugs: [
+      "agent-langgraph-crewai",
+      "agent-claude-sdk",
+      "agent-architectures",
+      "agent-observability-eval",
+    ],
+  },
+];

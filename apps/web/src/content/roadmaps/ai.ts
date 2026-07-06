@@ -15,6 +15,13 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Vectors, matrices, dot products, matrix multiplication as transformation, eigenvalues — geometrically, not just symbolically.",
           why: "Every model is matrix multiplication; attention, embeddings, and PCA all read as linear algebra.",
+          tasks: [
+            "Watch the 3Blue1Brown Essence of Linear Algebra series (all chapters) and note what each transformation does geometrically",
+            "Implement matrix multiplication from scratch in Python without using np.matmul — verify against NumPy on random inputs",
+            "Solve exercises from Mathematics for Machine Learning ch. 2-4 (at least 5 per chapter)",
+            "Implement eigenvalue decomposition on a 2x2 matrix by hand, then verify with np.linalg.eig",
+            "Explain in your own words: why does multiplying by a matrix transform space, and what do eigenvectors represent geometrically?",
+          ],
           estHours: 12,
           resources: [
             {
@@ -41,6 +48,13 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Derivatives, partial derivatives, the chain rule, and gradients — the machinery of backprop.",
           why: "Backpropagation IS the chain rule; you can't debug training without gradient intuition.",
+          tasks: [
+            "Watch the 3Blue1Brown Essence of Calculus series (chapters on derivatives and chain rule)",
+            "Compute partial derivatives of f(x,y) = x²y + sin(xy) by hand, then verify with a symbolic library (SymPy)",
+            "Read Mathematics for Machine Learning ch. 5 and work through the gradient examples",
+            "Implement numerical gradient checking: compute df/dx via (f(x+h)-f(x-h))/2h and compare against the analytic gradient for a small neural net",
+            "Draw the computational graph for a 2-layer neural net's forward pass, then trace the chain rule backward through it on paper",
+          ],
           estHours: 8,
           row: 1,
           resources: [
@@ -67,6 +81,13 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Distributions, conditional probability, Bayes' rule, expectation/variance, MLE, hypothesis testing.",
           why: "ML is applied probability — loss functions, sampling, and evaluation all live here.",
+          tasks: [
+            "Work through the Seeing Theory interactive modules on basic probability, distributions, and Bayesian inference",
+            "Watch StatQuest's videos on probability distributions, Bayes' theorem, and maximum likelihood estimation",
+            "Derive Bayes' rule from scratch and solve 3 real-world conditional probability problems (e.g., medical testing false positives)",
+            "Implement MLE for a Gaussian distribution from scratch: given samples, compute the mean and variance that maximize the likelihood",
+            "Explain in 2-3 sentences: why is cross-entropy loss equivalent to maximizing log-likelihood?",
+          ],
           estHours: 10,
           row: 1,
           resources: [
@@ -98,6 +119,12 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Vectorized array computing, broadcasting, DataFrame wrangling, joins/groupbys — no Python loops.",
           why: "The lingua franca of all ML work; broadcasting intuition transfers directly to tensor code.",
+          tasks: [
+            "Read the NumPy absolute basics guide and implement 5 array operations using broadcasting instead of Python loops",
+            "Complete the Kaggle pandas micro-course (all exercises)",
+            "Load a CSV dataset with pandas, handle missing values, perform a groupby aggregation, and merge two DataFrames on a shared key",
+            "Rewrite a loop-based computation (e.g., pairwise distances) as a single vectorized NumPy expression and benchmark the speedup",
+          ],
           estHours: 8,
           resources: [
             {
@@ -124,6 +151,12 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Cleaning, missing values, outliers, train/test leakage, matplotlib/seaborn EDA habits.",
           why: "Garbage in, garbage out — most real-world model failures are data failures.",
+          tasks: [
+            "Complete the Kaggle data cleaning micro-course (all exercises on missing values, inconsistent entries, and scaling)",
+            "Complete the Kaggle data visualization micro-course and recreate 3 chart types with matplotlib/seaborn on your own dataset",
+            "Read the scikit-learn common pitfalls guide and write down 3 ways train/test leakage can sneak in",
+            "Take a messy real-world CSV (e.g., from Kaggle Datasets) and perform a full EDA: profile missingness, detect outliers, and produce a 5-chart summary",
+          ],
           estHours: 6,
           resources: [
             {
@@ -155,6 +188,13 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Least squares, gradient descent from scratch, decision boundaries, regularization (L1/L2).",
           why: "The simplest complete ML loop — loss, gradient, optimization — everything deep learning scales up.",
+          tasks: [
+            "Watch StatQuest's linear regression video, then implement linear regression with gradient descent from scratch (no scikit-learn)",
+            "Extend your implementation to logistic regression: add sigmoid, switch to binary cross-entropy loss, and train on a 2D classification dataset",
+            "Add L2 regularization to your gradient descent code and plot how the decision boundary changes as lambda increases",
+            "Compare your from-scratch model's coefficients against scikit-learn's LinearRegression and LogisticRegression on the same data",
+            "Complete Andrew Ng's Machine Learning Specialization course 1 (weeks 1-3) on Coursera",
+          ],
           estHours: 8,
           resources: [
             {
@@ -181,6 +221,12 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Trees, bagging, random forests, gradient boosting (XGBoost/LightGBM) — the tabular-data champions.",
           why: "Boosted trees still beat neural nets on most tabular problems; every applied role touches them.",
+          tasks: [
+            "Watch StatQuest's decision tree and random forest videos, then implement a decision tree classifier from scratch using recursive splitting on Gini impurity",
+            "Read the XGBoost official tutorial on the boosting model and explain in your own words how gradient boosting differs from bagging",
+            "Complete the Kaggle intermediate ML micro-course (exercises on random forests and XGBoost)",
+            "Train XGBoost and LightGBM on a Kaggle tabular dataset, tune hyperparameters with cross-validation, and compare against your from-scratch tree",
+          ],
           estHours: 8,
           row: 1,
           resources: [
@@ -207,6 +253,12 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Margin-based classification, distance-based methods, k-means/DBSCAN, dimensionality reduction.",
           why: "Rounds out the classical toolbox and builds the embedding-space intuition LLM work relies on.",
+          tasks: [
+            "Watch StatQuest's SVM and PCA videos, then implement k-means clustering from scratch and test it on the Naftali Harris visualizer's example datasets",
+            "Implement PCA from scratch using eigendecomposition of the covariance matrix; apply it to a high-dimensional dataset and plot the first 2 components",
+            "Read the scikit-learn user guide sections on SVM, clustering, and decomposition — train each on a sample dataset",
+            "Explain in your own words: how does the kernel trick let SVMs handle non-linear boundaries without explicitly computing the high-dimensional feature space?",
+          ],
           estHours: 8,
           row: 1,
           resources: [
@@ -233,6 +285,12 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Cross-validation, precision/recall/F1, ROC-AUC, calibration, bias-variance, data leakage traps.",
           why: "A model is only as real as its evaluation — this skill transfers straight to LLM evals later.",
+          tasks: [
+            "Read the scikit-learn model evaluation guide and implement k-fold cross-validation from scratch (without using cross_val_score)",
+            "Watch StatQuest's ROC and AUC video, then plot ROC curves for 3 different classifiers on the same dataset and compare",
+            "Take a binary classifier and compute precision, recall, F1, and AUC by hand from the confusion matrix — verify against sklearn.metrics",
+            "Create a deliberately leaky pipeline (e.g., scaling before splitting) and a correct one; show the performance gap to internalize why leakage matters",
+          ],
           estHours: 6,
           resources: [
             {
@@ -264,6 +322,13 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Neurons, activation functions, computational graphs, and backprop built by hand — micrograd style.",
           why: "Build it once from scratch and every framework becomes transparent instead of magic.",
+          tasks: [
+            "Watch Karpathy's 'spelled-out intro to neural networks and backpropagation' video and follow along in a notebook",
+            "Build micrograd from scratch: implement Value class with +, *, tanh, backward() — get the full autograd engine working",
+            "Watch the 3Blue1Brown neural networks series (chapters 1-4) and draw the computational graph for a 2-layer MLP",
+            "Train your micrograd MLP on a toy 2D classification dataset (e.g., moons) and visualize the decision boundary",
+            "Implement backprop for a 3-layer MLP using only NumPy (no autograd) and verify gradients numerically",
+          ],
           estHours: 12,
           resources: [
             {
@@ -291,6 +356,13 @@ export const aiRoadmap: Roadmap = {
           summary:
             "SGD, momentum, Adam, learning-rate schedules, batch norm, dropout, weight decay, debugging loss curves.",
           why: "Training is where things actually go wrong — reading a loss curve is a daily skill.",
+          tasks: [
+            "Read Karpathy's 'A recipe for training neural networks' blog post and write down the checklist as your personal reference",
+            "Implement SGD, SGD+momentum, and Adam from scratch in NumPy; train each on the same problem and plot the loss curves side by side",
+            "Read the Distill article 'Why Momentum Really Works' and explain the momentum analogy in your own words",
+            "Take a model that overfits a small dataset, then add dropout and weight decay one at a time — plot how each affects train vs. val loss",
+            "Read the d2l.ai optimization chapters and implement a learning rate schedule (e.g., cosine annealing) from scratch",
+          ],
           estHours: 8,
           resources: [
             {
@@ -316,6 +388,12 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Convolutions, pooling, classic architectures (ResNet), transfer learning for image tasks.",
           why: "Convolution is a core idea beyond vision, and transfer learning is the pattern for all applied DL.",
+          tasks: [
+            "Watch the 3Blue1Brown convolution video and read CS231n notes on convolutional layers, pooling, and architecture design",
+            "Implement a Conv2d layer from scratch using NumPy (nested loops are fine) — verify output shape and values against PyTorch's nn.Conv2d",
+            "Train a small CNN on CIFAR-10 from scratch in PyTorch, achieving at least 70% test accuracy",
+            "Fine-tune a pretrained ResNet on a custom image classification task using fast.ai or PyTorch transfer learning — compare against your from-scratch CNN",
+          ],
           estHours: 8,
           row: 1,
           resources: [
@@ -343,6 +421,12 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Recurrence, LSTMs/GRUs, why long-range dependencies are hard — the road that led to attention.",
           why: "You'll appreciate transformers only after seeing the problems RNNs couldn't solve.",
+          tasks: [
+            "Read Chris Olah's 'Understanding LSTM Networks' post and draw the LSTM cell diagram from memory, labeling each gate",
+            "Read Karpathy's 'The Unreasonable Effectiveness of RNNs' and run his char-rnn on a small text corpus to see the generated output",
+            "Implement a vanilla RNN cell from scratch in NumPy: forward pass, hidden state update, and backprop through time for 5 steps",
+            "Train a character-level LSTM in PyTorch on a small text file and explain why it handles long sequences better than your vanilla RNN",
+          ],
           estHours: 6,
           row: 1,
           resources: [
@@ -369,6 +453,12 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Word2vec intuition, learned representations, cosine similarity, embedding spaces as geometry.",
           why: "Embeddings power RAG, search, recommendations, and clustering — the workhorse of applied AI.",
+          tasks: [
+            "Read Jay Alammar's 'The Illustrated Word2vec' and explain skip-gram vs CBOW in your own words",
+            "Read Vicki Boykis's 'What are embeddings?' (chapters 1-5) and note 3 non-NLP use cases for embeddings",
+            "Implement word2vec (skip-gram) from scratch in NumPy on a small corpus — train it and visualize the learned vectors with PCA/t-SNE",
+            "Use an embedding API (OpenAI or sentence-transformers) to embed 50 sentences, compute cosine similarities, and cluster them with k-means",
+          ],
           estHours: 5,
           resources: [
             {
@@ -400,6 +490,13 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Self-attention, multi-head attention, positional encodings, encoder/decoder — the architecture behind everything.",
           why: "One architecture runs the entire modern AI stack; you should be able to draw it from memory.",
+          tasks: [
+            "Read Jay Alammar's 'The Illustrated Transformer' end to end and draw the full architecture diagram from memory",
+            "Read the 'Attention Is All You Need' paper — focus on sections 3.1-3.3 (scaled dot-product attention, multi-head attention, positional encoding)",
+            "Implement scaled dot-product attention from scratch in NumPy: Q, K, V matrices, softmax(QK^T/sqrt(d))V",
+            "Follow Karpathy's 'Let's build GPT from scratch' video and build a working nanoGPT that trains on Shakespeare",
+            "Explain in your own words: why does self-attention scale quadratically with sequence length, and what does each attention head learn to attend to?",
+          ],
           estHours: 10,
           resources: [
             {
@@ -426,6 +523,12 @@ export const aiRoadmap: Roadmap = {
           summary:
             "BPE, vocabularies, why tokenizers cause weird model behavior, context-window accounting.",
           why: "Half of LLM gotchas (costs, truncation, odd failures on spelling/math) trace back to tokenization.",
+          tasks: [
+            "Watch Karpathy's 'Let's build the GPT Tokenizer' video and follow along to implement BPE from scratch",
+            "Use the tiktokenizer playground to tokenize 10 tricky inputs (code, emoji, non-English text, numbers) and note the surprising splits",
+            "Read the Hugging Face tokenizers course chapter and explain the difference between BPE, WordPiece, and SentencePiece",
+            "Implement a minimal BPE tokenizer from scratch: build the merge table from a corpus, encode and decode a string, and count tokens for cost estimation",
+          ],
           estHours: 4,
           row: 1,
           resources: [
@@ -452,6 +555,12 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Pretraining objectives, scaling laws, instruction tuning, RLHF/DPO — the full pipeline from web text to assistant.",
           why: "Knowing how the sausage is made explains model strengths, failure modes, and why prompting works.",
+          tasks: [
+            "Watch Karpathy's 'Deep dive into LLMs like ChatGPT' video and take notes on the 3-stage pipeline (pretraining, SFT, RLHF)",
+            "Read the InstructGPT/RLHF paper (sections 1-3) and explain in your own words how reward modeling works",
+            "Work through at least 3 chapters of Sebastian Raschka's 'LLMs from scratch' repo — run the code and train a small language model",
+            "Write a 1-page summary explaining: what does the model learn during pretraining vs. instruction tuning vs. RLHF, and why are all three needed?",
+          ],
           estHours: 6,
           row: 1,
           resources: [
@@ -479,6 +588,13 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Full fine-tuning vs parameter-efficient methods (LoRA/QLoRA), datasets, when fine-tuning beats prompting.",
           why: "The cheapest way to specialize a model — and a very employable, hands-on skill.",
+          tasks: [
+            "Read the LoRA paper (sections 1-4) and explain in your own words: what are the low-rank matrices A and B, and why does this save memory?",
+            "Read the Hugging Face PEFT docs and set up a LoRA fine-tune of a small model (e.g., Llama 3 8B or Mistral 7B) on a custom dataset",
+            "Prepare a fine-tuning dataset: curate at least 200 instruction/response pairs for a specific domain task",
+            "Fine-tune a model using Unsloth or Hugging Face PEFT with QLoRA, evaluate on a held-out set, and compare against the base model's zero-shot performance",
+            "Write a decision checklist: when should you fine-tune vs. use few-shot prompting vs. RAG for a given task?",
+          ],
           estHours: 8,
           resources: [
             {
@@ -505,6 +621,12 @@ export const aiRoadmap: Roadmap = {
           summary:
             "System prompts, few-shot examples, chain-of-thought, structured output, prompt-injection awareness.",
           why: "The highest-leverage, zero-cost way to improve LLM apps — and it compounds with everything else.",
+          tasks: [
+            "Read the Claude prompt engineering guide end to end and try each technique (system prompts, few-shot, chain-of-thought) on a real task",
+            "Read the Prompt Engineering Guide (promptingguide.ai) sections on advanced techniques: self-consistency, ReAct, and tree-of-thought",
+            "Pick a task that fails with a naive prompt, then iteratively improve it using 3+ techniques until it reliably succeeds — document each iteration",
+            "Work through 3 examples from the Anthropic cookbook, modifying them for your own use case",
+          ],
           estHours: 4,
           resources: [
             {
@@ -536,6 +658,13 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Chunking, embedding, ANN indexes (HNSW), hybrid search, reranking, and grounding LLM answers in your data.",
           why: "The default architecture for 'LLM + my company's data' — the most-built AI system of this era.",
+          tasks: [
+            "Read the Pinecone RAG learning center article and diagram the full pipeline: chunk → embed → index → query → rerank → generate",
+            "Read Chip Huyen's RAG blog posts and list 5 failure modes of naive RAG (e.g., wrong chunk size, no reranking)",
+            "Set up pgvector in Postgres, embed 100 documents with sentence-transformers, and run similarity search queries",
+            "Build a minimal RAG pipeline from scratch: chunk a PDF, embed chunks, store in a vector DB, retrieve top-k, and pass to an LLM with the context",
+            "Implement hybrid search (keyword BM25 + vector similarity) and compare retrieval quality against pure vector search on 10 test queries",
+          ],
           estHours: 8,
           resources: [
             {
@@ -563,6 +692,12 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Function calling, agent loops (reason → act → observe), MCP, multi-step planning, guardrails.",
           why: "The frontier of applied AI — agentic patterns are what companies are hiring for right now.",
+          tasks: [
+            "Read Anthropic's 'Building effective agents' article and diagram the 5 agentic patterns (prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer)",
+            "Read the Claude tool use docs and implement a simple function-calling agent that can use 2-3 tools (e.g., calculator, web search, file reader)",
+            "Read the MCP specification and set up an MCP server that exposes a tool — connect it to Claude or another LLM client",
+            "Build a multi-step agent loop from scratch: reason → select tool → call tool → observe result → decide next step, with a maximum iteration limit and error handling",
+          ],
           estHours: 8,
           resources: [
             {
@@ -589,6 +724,13 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Model serving (vLLM), batching, GPU basics, quantization, experiment tracking, deployment pipelines.",
           why: "Models create value only in production; serving economics decide what's actually shippable.",
+          tasks: [
+            "Read the vLLM docs and serve a small open-source model locally — measure tokens/second and compare with a naive HuggingFace generate() loop",
+            "Read the Made With ML MLOps course sections on experiment tracking and set up a training run with Weights & Biases or MLflow logging",
+            "Quantize a model to 4-bit (GPTQ or AWQ) and benchmark the latency vs. quality tradeoff against the full-precision version",
+            "Deploy a model behind a FastAPI endpoint with batching, health checks, and basic request logging — load test it with 10 concurrent requests",
+            "Read the Full Stack Deep Learning course materials on deployment and write a 1-page checklist for taking a model from notebook to production",
+          ],
           estHours: 8,
           resources: [
             {
@@ -614,6 +756,12 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Golden sets, LLM-as-judge, regression suites for prompts, human eval, benchmark skepticism.",
           why: "Teams that can't measure quality can't improve it — evals are the #1 differentiator in AI product work.",
+          tasks: [
+            "Read Hamel Husain's 'Your AI product needs evals' blog post and list the 3 levels of eval maturity he describes",
+            "Read the Claude docs on defining success criteria and build a golden test set of 20 input/expected-output pairs for a real LLM task",
+            "Implement an LLM-as-judge evaluator: write a grading prompt that scores LLM outputs on a rubric, then measure inter-rater agreement against your own human scores",
+            "Build a regression test suite that runs automatically when you change a prompt — flag any outputs that degrade beyond a threshold",
+          ],
           estHours: 6,
           row: 1,
           resources: [
@@ -641,6 +789,12 @@ export const aiRoadmap: Roadmap = {
           summary:
             "Prompt injection, jailbreaks, data privacy, hallucination mitigation, alignment basics.",
           why: "Production AI without a threat model is a liability; safety fluency is increasingly table stakes.",
+          tasks: [
+            "Read the OWASP Top 10 for LLM Applications and write down the top 5 risks most relevant to your work",
+            "Read Simon Willison's prompt injection primer series and attempt 3 prompt injection attacks on a test chatbot you control",
+            "Read 2-3 Anthropic research publications on alignment and safety — summarize the key ideas in your own words",
+            "Implement input/output guardrails for an LLM app: content filtering on inputs, hallucination detection on outputs, and PII redaction",
+          ],
           estHours: 4,
           row: 1,
           resources: [

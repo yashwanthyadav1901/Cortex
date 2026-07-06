@@ -16,11 +16,13 @@ export default function ProjectDetailPage() {
   const [starting, setStarting] = useState(false);
 
   useEffect(() => {
-    get<Project[]>("/projects").then((mine) => {
-      if (project && mine.some((m) => m.title === project.title)) {
-        setAlreadyStarted(true);
-      }
-    });
+    get<Project[]>("/projects")
+      .then((mine) => {
+        if (project && mine.some((m) => m.title === project.title)) {
+          setAlreadyStarted(true);
+        }
+      })
+      .catch(() => {});
   }, [project]);
 
   if (!project) {
@@ -48,6 +50,7 @@ export default function ProjectDetailPage() {
         status: "in_progress",
       });
       router.push("/projects");
+    } catch {
     } finally {
       setStarting(false);
     }

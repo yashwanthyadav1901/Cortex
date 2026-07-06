@@ -6,19 +6,31 @@ import { useEffect, useState } from "react";
 import RoadmapFlow from "@/components/roadmap/RoadmapFlow";
 import { allNodes, PILLAR_SLUGS, ROADMAPS } from "@/content";
 import { get } from "@/lib/api";
-import type { TopicStatus } from "@/types";
+import type { DsaProblem, TopicProgress } from "@/types";
 
 export default function RoadmapPillarPage() {
   const params = useParams<{ pillar: string }>();
   const pillar = PILLAR_SLUGS[params.pillar];
-  const [progress, setProgress] = useState<Record<string, TopicStatus>>({});
+  const [progress, setProgress] = useState<Record<string, TopicProgress>>({});
+  const [dsaSolvedCount, setDsaSolvedCount] = useState<{ solved: number; total: number } | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    get<Record<string, TopicStatus>>("/progress")
+    get<Record<string, TopicProgress>>("/progress")
       .then(setProgress)
+      .catch(() => {})
       .finally(() => setLoaded(true));
-  }, []);
+    if (params.pillar === "dsa") {
+      get<DsaProblem[]>("/dsa-problems")
+        .then((problems) => {
+          setDsaSolvedCount({
+            solved: problems.filter((p) => p.status === "solved").length,
+            total: problems.length,
+          });
+        })
+        .catch(() => {});
+    }
+  }, [params.pillar]);
 
   if (!pillar) {
     return (
@@ -33,7 +45,7 @@ export default function RoadmapPillarPage() {
 
   const roadmap = ROADMAPS[pillar];
   const nodes = allNodes(roadmap);
-  const done = nodes.filter((n) => progress[n.slug] === "done").length;
+  const done = nodes.filter((n) => progress[n.slug]?.status === "done").length;
   const pct = Math.round((done / nodes.length) * 100);
   const totalHours = nodes.reduce((sum, n) => sum + n.estHours, 0);
 
@@ -47,9 +59,16 @@ export default function RoadmapPillarPage() {
             </Link>
             <h1 className="text-xl font-bold">{roadmap.title}</h1>
           </div>
-          <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">
-            {done}/{nodes.length}
-          </span>
+          <div className="text-right">
+            <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">
+              {done}/{nodes.length} topics
+            </span>
+            {dsaSolvedCount && dsaSolvedCount.total > 0 && (
+              <span className="block text-xs text-zinc-400">
+                {dsaSolvedCount.solved}/{dsaSolvedCount.total} problems solved
+              </span>
+            )}
+          </div>
         </div>
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
           <div

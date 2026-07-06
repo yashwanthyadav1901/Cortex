@@ -19,7 +19,7 @@ export default function ProjectsPage() {
   }, []);
 
   useEffect(() => {
-    loadMine();
+    loadMine().catch(() => {});
   }, [loadMine]);
 
   const catalog = PROJECTS.filter(
@@ -28,13 +28,17 @@ export default function ProjectsPage() {
   const started = new Set(mine.map((m) => m.title));
 
   async function setStatus(project: Project, status: ProjectStatus) {
-    const updated = await patch<Project>(`/projects/${project.id}`, { status });
-    setMine((ps) => ps.map((p) => (p.id === project.id ? updated : p)));
+    try {
+      const updated = await patch<Project>(`/projects/${project.id}`, { status });
+      setMine((ps) => ps.map((p) => (p.id === project.id ? updated : p)));
+    } catch {}
   }
 
   async function remove(id: string) {
-    await del(`/projects/${id}`);
-    setMine((ps) => ps.filter((p) => p.id !== id));
+    try {
+      await del(`/projects/${id}`);
+      setMine((ps) => ps.filter((p) => p.id !== id));
+    } catch {}
   }
 
   return (

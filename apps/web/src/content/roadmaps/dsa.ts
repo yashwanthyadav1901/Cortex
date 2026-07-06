@@ -15,6 +15,12 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "How to measure time and space cost of code: O(1), O(log n), O(n), O(n log n), O(n²), amortized analysis.",
           why: "Every interview answer starts with 'what's the complexity?' — you can't pick the right approach without this lens.",
+          tasks: [
+            "Watch 'Big-O Notation in 100 Seconds → full explanation' by NeetCode and write down each complexity class with a concrete code example",
+            "Analyze 10 short code snippets (nested loops, recursive calls, hash lookups) and label each with its Big-O time and space — then verify with the Big-O Cheat Sheet",
+            "Step through 3 VisuAlgo visualizations (binary search, merge sort, BFS) and trace why each is O(log n), O(n log n), and O(V+E) respectively",
+            "Write a cheat card from memory: list every common complexity class, one canonical algorithm for each, and its recurrence relation if applicable",
+          ],
           estHours: 4,
           resources: [
             {
@@ -40,6 +46,13 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Contiguous memory, indexing, in-place manipulation, prefix sums, string building and immutability.",
           why: "The substrate for ~40% of all interview problems; prefix sums alone unlock a whole problem family.",
+          tasks: [
+            "Complete the first 10 problems of the LeetCode Arrays 101 Explore Card",
+            "Implement a prefix sum array from scratch and use it to solve 'Subarray Sum Equals K'",
+            "Solve 3 sliding-window problems from the NeetCode Arrays & Hashing section: 'Two Sum', 'Group Anagrams', and 'Top K Frequent Elements'",
+            "Read the USACO Guide prefix sums article and solve 2 practice problems from it",
+            "Write out the time/space complexity for each solution and verify against the Big-O Cheat Sheet",
+          ],
           estHours: 8,
           resources: [
             {
@@ -67,6 +80,13 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Hash functions, collision handling, O(1) lookup tables, frequency counting, seen-sets.",
           why: "The single most-used tool in interviews — 'can a hash map make this O(n)?' is always the first question to ask.",
+          tasks: [
+            "Watch the CS50 Hash Tables short and implement a hash map from scratch with chaining collision resolution",
+            "Complete the LeetCode Hash Table Explore Card (first 8 problems)",
+            "Solve 'Two Sum', 'Contains Duplicate', and 'Valid Anagram' using hash-map-based O(n) approaches",
+            "Implement an LRU Cache (LeetCode #146) using a hash map + doubly linked list",
+            "Reimplement your hash map with open addressing (linear probing) and compare performance against chaining",
+          ],
           estHours: 6,
           resources: [
             {
@@ -98,6 +118,12 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Converging, parallel, and fast/slow pointer techniques over sorted arrays and sequences.",
           why: "Turns brute-force O(n²) pair scans into O(n); shows up in dozens of top-100 problems.",
+          tasks: [
+            "Solve 'Two Sum II' (sorted array) and 'Three Sum' using converging two pointers",
+            "Solve 'Container With Most Water' and 'Trapping Rain Water' from the NeetCode Two Pointers section",
+            "Implement the fast/slow pointer pattern to solve 'Linked List Cycle' and 'Happy Number'",
+            "Complete all problems in Striver's A2Z sheet Steps 3-5 that use pointer techniques",
+          ],
           estHours: 6,
           row: 1,
           resources: [
@@ -125,6 +151,12 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Fixed and variable-size windows for substring/subarray problems; expand-shrink with a hash map.",
           why: "The canonical way to handle 'longest/shortest subarray with property X' — a guaranteed interview topic.",
+          tasks: [
+            "Watch the NeetCode Sliding Window Technique video and write out the expand-shrink template in your own code",
+            "Solve 3 fixed-window problems: 'Maximum Sum Subarray of Size K', 'Maximum Average Subarray I', and 'Find All Anagrams in a String'",
+            "Solve 3 variable-window problems: 'Longest Substring Without Repeating Characters', 'Minimum Window Substring', and 'Longest Repeating Character Replacement'",
+            "Complete the full NeetCode 150 Sliding Window section and write a one-paragraph summary of when to use fixed vs variable windows",
+          ],
           estHours: 6,
           row: 1,
           resources: [
@@ -151,6 +183,12 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "LIFO processing, matching brackets, expression evaluation, and monotonic stacks for next-greater-element problems.",
           why: "Monotonic stack is the trick behind a family of 'previous/next greater' problems that are brutal without it.",
+          tasks: [
+            "Implement a stack from scratch (array-backed) and solve 'Valid Parentheses' and 'Min Stack'",
+            "Complete the LeetCode Queue & Stack Explore Card stack section",
+            "Read the USACO Guide monotonic stack article, then solve 'Next Greater Element I', 'Daily Temperatures', and 'Largest Rectangle in Histogram'",
+            "Solve 'Evaluate Reverse Polish Notation' and 'Generate Parentheses' from the NeetCode Stack section",
+          ],
           estHours: 6,
           row: 2,
           resources: [
@@ -178,6 +216,12 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "FIFO processing, circular buffers, and deques for sliding-window-maximum style problems.",
           why: "Foundation for BFS later; the monotonic deque pattern is a classic hard-problem unlock.",
+          tasks: [
+            "Implement a queue from scratch using a circular buffer (fixed-size array)",
+            "Watch the NeetCode 'Sliding Window Maximum' video and implement the monotonic deque solution",
+            "Solve 'Sliding Window Maximum' (LeetCode #239) and 'Design Circular Deque' (LeetCode #641)",
+            "Read the Python collections.deque docs and rewrite one of your queue solutions using deque to compare ergonomics",
+          ],
           estHours: 4,
           row: 2,
           resources: [
@@ -204,6 +248,13 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Singly/doubly linked lists, pointer surgery, reversal, cycle detection (Floyd's), merging.",
           why: "Tests raw pointer manipulation; fast/slow cycle detection is a perennial favorite.",
+          tasks: [
+            "Implement a singly linked list from scratch with insert, delete, search, and reverse operations",
+            "Complete the LeetCode Linked List Explore Card (all problems)",
+            "Solve 'Reverse Linked List', 'Merge Two Sorted Lists', and 'Reorder List' from NeetCode 150",
+            "Read the Floyd's cycle detection article on cp-algorithms, then solve 'Linked List Cycle II' and 'Find the Duplicate Number'",
+            "Implement a doubly linked list and use it to build an LRU Cache from scratch",
+          ],
           estHours: 6,
           resources: [
             {
@@ -230,6 +281,12 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Classic search plus 'binary search on the answer' — searching any monotonic condition space.",
           why: "The O(log n) workhorse; the on-the-answer variant solves problems that look nothing like search.",
+          tasks: [
+            "Complete the LeetCode Binary Search Explore Card (all 3 templates)",
+            "Solve 'Binary Search', 'Search a 2D Matrix', and 'Koko Eating Bananas' from NeetCode 150",
+            "Read the cp-algorithms binary search article and implement both lower-bound and upper-bound variants from scratch",
+            "Solve 2 'binary search on the answer' problems: 'Capacity to Ship Packages Within D Days' and 'Split Array Largest Sum'",
+          ],
           estHours: 6,
           row: 3,
           resources: [
@@ -256,6 +313,12 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Merge sort, quick sort, heap sort, counting sort — mechanics, stability, and when each wins.",
           why: "Sort-first is a common simplification step, and merge/quick sort mechanics get asked directly.",
+          tasks: [
+            "Implement merge sort from scratch and trace the recursion tree for an 8-element array on paper",
+            "Implement quicksort with Lomuto and Hoare partition schemes; compare their swap counts on a sorted vs random array",
+            "Watch the Abdul Bari sorting lectures and implement counting sort for an array of integers in range [0, k]",
+            "Use VisuAlgo's sorting page to visualize each algorithm, then write a comparison table: best/worst/average time, space, and stability for merge sort, quick sort, heap sort, and counting sort",
+          ],
           estHours: 6,
           row: 3,
           resources: [
@@ -283,6 +346,12 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Base cases, call stacks, recurrence relations, and splitting problems into independent halves.",
           why: "The mental model that trees, backtracking, and DP are all built on — weak recursion sinks everything after it.",
+          tasks: [
+            "Complete the LeetCode Recursion I Explore Card (all problems)",
+            "Implement merge sort and binary search recursively, drawing the call stack for each on paper",
+            "Solve 'Pow(x, n)' and 'Maximum Subarray' (divide-and-conquer approach) to practice splitting problems",
+            "Watch the Abdul Bari recursion lectures and write recurrence relations for 3 recursive functions, then solve them using the Master theorem",
+          ],
           estHours: 6,
           resources: [
             {
@@ -313,6 +382,13 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Tree traversal (pre/in/post/level order), recursion on trees, depth/diameter/path problems.",
           why: "Trees are the most-asked interview structure, and traversal recursion is the template for all of them.",
+          tasks: [
+            "Implement a binary tree from scratch with insert and all 4 traversals: preorder, inorder, postorder (recursive), and level-order (BFS with queue)",
+            "Complete the LeetCode Binary Tree Explore Card",
+            "Solve 'Maximum Depth of Binary Tree', 'Invert Binary Tree', 'Same Tree', and 'Diameter of Binary Tree' from NeetCode 150",
+            "Solve 'Binary Tree Level Order Traversal', 'Lowest Common Ancestor', and 'Serialize and Deserialize Binary Tree'",
+            "Visualize tree traversals on VisuAlgo, then whiteboard the recursive structure of 'Maximum Path Sum'",
+          ],
           estHours: 8,
           resources: [
             {
@@ -338,6 +414,13 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "BST invariant, insert/delete/search, validation, in-order successor, and balanced-tree intuition.",
           why: "The in-order-traversal-is-sorted property powers a family of elegant problems; also explains how DB indexes think.",
+          tasks: [
+            "Implement a BST from scratch with insert, delete, search, and in-order traversal",
+            "Watch the NeetCode 'Validate BST' walkthrough, then solve 'Validate Binary Search Tree' and 'Kth Smallest Element in a BST'",
+            "Solve 'Lowest Common Ancestor of a BST' and 'Convert Sorted Array to BST' from NeetCode 150",
+            "Read the self-balancing trees overview (AVL/Red-Black) on Wikipedia and implement an AVL tree with rotations",
+            "Use VisuAlgo's BST page to insert 20 random keys, observing when the tree becomes unbalanced",
+          ],
           estHours: 5,
           row: 1,
           resources: [
@@ -364,6 +447,13 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Binary heap mechanics, heapify, top-K problems, two-heap median pattern, K-way merge.",
           why: "'Top K' and 'K-way merge' problems are everywhere, and heaps are the only efficient answer.",
+          tasks: [
+            "Implement a min-heap from scratch with insert, extract-min, and heapify operations",
+            "Solve 'Kth Largest Element in a Stream', 'Last Stone Weight', and 'K Closest Points to Origin' from NeetCode 150",
+            "Implement the two-heap pattern to solve 'Find Median from Data Stream'",
+            "Solve 'Merge K Sorted Lists' using a min-heap for K-way merge",
+            "Read the Python heapq docs and rewrite your heap solutions using the standard library",
+          ],
           estHours: 6,
           row: 1,
           resources: [
@@ -391,6 +481,12 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Character-by-character trees for prefix matching, autocomplete, and word search problems.",
           why: "The right structure whenever the word 'prefix' appears; a favorite medium-hard interview topic.",
+          tasks: [
+            "Watch the NeetCode 'Implement Trie' walkthrough and implement a trie from scratch with insert, search, and startsWith",
+            "Solve 'Implement Trie (Prefix Tree)' and 'Design Add and Search Words Data Structure' on LeetCode",
+            "Complete the LeetCode Trie Explore Card",
+            "Solve 'Word Search II' using a trie to prune the backtracking search space",
+          ],
           estHours: 4,
           resources: [
             {
@@ -422,6 +518,13 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Adjacency lists/matrices, BFS for shortest unweighted paths, DFS for connectivity, islands, and flood fill.",
           why: "Graphs are the hardest common interview family — BFS/DFS fluency is the entry ticket.",
+          tasks: [
+            "Implement a graph class from scratch supporting both adjacency list and adjacency matrix representations",
+            "Implement BFS and DFS (iterative + recursive) on your graph class; trace visit order on a 6-node sample graph",
+            "Watch the freeCodeCamp Graph Algorithms video (first 2 hours) and solve 'Number of Islands' and 'Clone Graph'",
+            "Solve 'Pacific Atlantic Water Flow', 'Rotting Oranges', and 'Surrounded Regions' from NeetCode 150",
+            "Read the cp-algorithms BFS article and implement shortest-path-in-unweighted-graph using BFS",
+          ],
           estHours: 10,
           resources: [
             {
@@ -448,6 +551,12 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Ordering DAG nodes by dependency: Kahn's algorithm (BFS) and DFS post-order, cycle detection.",
           why: "Course-schedule-style dependency problems are an interview staple, and it powers real build systems.",
+          tasks: [
+            "Read the cp-algorithms topological sort article and implement both Kahn's (BFS) and DFS-based topological sort",
+            "Watch the NeetCode 'Course Schedule' walkthrough, then solve 'Course Schedule' and 'Course Schedule II'",
+            "Solve 'Alien Dictionary' to apply topological sort to a non-obvious problem",
+            "Add cycle detection to both implementations and verify they reject a graph with a back edge",
+          ],
           estHours: 4,
           row: 1,
           resources: [
@@ -474,6 +583,12 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Disjoint sets with path compression and union by rank for dynamic connectivity problems.",
           why: "Turns 'are these connected / count components as edges arrive' into near-O(1) — unbeatable when it applies.",
+          tasks: [
+            "Read the cp-algorithms DSU article and implement Union-Find from scratch with path compression and union by rank",
+            "Watch NeetCode's 'Union Find in 5 minutes' and solve 'Number of Connected Components in an Undirected Graph'",
+            "Solve 'Redundant Connection' and 'Accounts Merge' using your Union-Find implementation",
+            "Read the USACO Guide DSU section and solve 2 practice problems from it",
+          ],
           estHours: 4,
           row: 1,
           resources: [
@@ -500,6 +615,13 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Weighted shortest paths: Dijkstra with a heap, Bellman-Ford for negative edges, intro to A*.",
           why: "The capstone graph algorithm — appears in interviews and in every routing/maps system you'll ever design.",
+          tasks: [
+            "Read the cp-algorithms Dijkstra article and implement Dijkstra's algorithm with a min-heap from scratch",
+            "Watch the Computerphile Dijkstra video and trace the algorithm step-by-step on a 7-node weighted graph on paper",
+            "Solve 'Network Delay Time' and 'Cheapest Flights Within K Stops' on LeetCode",
+            "Implement Bellman-Ford from scratch and verify it detects a negative-weight cycle on a test graph",
+            "Solve 3 problems from the CSES Graph section: 'Shortest Routes I', 'Shortest Routes II', and 'Flight Discount'",
+          ],
           estHours: 6,
           resources: [
             {
@@ -532,6 +654,13 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Systematic choice-explore-unchoose search: subsets, permutations, combination sums, N-Queens, word search.",
           why: "The bridge between recursion and DP; 'generate all X' problems have exactly one right template.",
+          tasks: [
+            "Watch NeetCode's backtracking template video (Subsets) and write the choose-explore-unchoose template from memory",
+            "Solve 'Subsets', 'Subsets II', and 'Permutations' to drill the core template",
+            "Solve 'Combination Sum', 'Combination Sum II', and 'Palindrome Partitioning' from NeetCode 150",
+            "Solve 'N-Queens' and 'Word Search' to practice constraint pruning within backtracking",
+            "Read the USACO Guide complete search article and solve 1 additional problem from it",
+          ],
           estHours: 8,
           resources: [
             {
@@ -558,6 +687,12 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Local-optimum choices with an exchange-argument proof mindset: jump game, gas station, scheduling.",
           why: "When greedy works it destroys the DP alternative — the skill is proving to yourself it's safe.",
+          tasks: [
+            "Read the USACO Guide greedy algorithms article and summarize the exchange-argument proof technique in your own words",
+            "Solve 'Jump Game' and 'Jump Game II' from NeetCode 150 using greedy approaches",
+            "Solve 'Gas Station', 'Hand of Straights', and 'Maximum Subarray' (Kadane's algorithm) from NeetCode 150",
+            "For each solution, write a 2-sentence argument for why greedy is correct (exchange argument or stays-ahead proof)",
+          ],
           estHours: 5,
           row: 1,
           resources: [
@@ -584,6 +719,12 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Sort-then-sweep over ranges: merge intervals, meeting rooms, insert interval, min arrows.",
           why: "A compact, learnable pattern that shows up constantly in scheduling-flavored questions.",
+          tasks: [
+            "Watch the NeetCode 'Merge Intervals' walkthrough and implement the sort-then-merge pattern",
+            "Solve 'Merge Intervals', 'Insert Interval', and 'Non-overlapping Intervals' from NeetCode 150",
+            "Solve 'Meeting Rooms' and 'Meeting Rooms II' to practice the sweep-line variant",
+            "Solve 'Minimum Number of Arrows to Burst Balloons' and write out the greedy proof for why sorting by end time works",
+          ],
           estHours: 4,
           row: 1,
           resources: [
@@ -610,6 +751,13 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Memoization vs tabulation, state definition, transitions: climbing stairs, house robber, coin change, LIS.",
           why: "DP separates strong candidates from the rest; 1-D problems teach the state-definition skill everything else needs.",
+          tasks: [
+            "Watch the Reducible 'Dynamic Programming — 5 steps framework' video and write the 5-step template in your notes",
+            "Solve 'Climbing Stairs' and 'House Robber' both top-down (memoization) and bottom-up (tabulation) to internalize both styles",
+            "Solve 'Coin Change', 'Longest Increasing Subsequence', and 'Word Break' from NeetCode 150",
+            "Read the USACO Guide DP introduction and solve 2 practice problems from it",
+            "Solve 'Decode Ways' and 'Maximum Product Subarray', writing out the state definition and transition for each before coding",
+          ],
           estHours: 12,
           resources: [
             {
@@ -635,6 +783,13 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Grid DP, knapsack, edit distance, longest common subsequence, interval DP, DP on strings.",
           why: "Knapsack + LCS + edit distance are the three archetypes behind most hard DP interview questions.",
+          tasks: [
+            "Implement 0/1 Knapsack from scratch (both 2D table and space-optimized 1D), tracing the table fill on paper for a small example",
+            "Watch the NeetCode 'Edit Distance' walkthrough, then solve 'Edit Distance' and 'Longest Common Subsequence'",
+            "Solve 'Unique Paths', 'Coin Change II' (unbounded knapsack), and 'Target Sum' from NeetCode 150",
+            "Read the USACO Guide knapsack patterns article and solve 2 practice problems from it",
+            "Solve 'Interleaving String' and 'Longest Palindromic Subsequence', drawing the DP table for each before coding",
+          ],
           estHours: 12,
           resources: [
             {
@@ -666,6 +821,12 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "AND/OR/XOR tricks, masks, counting bits, single-number problems, bitset thinking.",
           why: "Cheap wins on a small set of classic problems, and essential vocabulary for low-level work.",
+          tasks: [
+            "Read the Bit Twiddling Hacks article (Stanford) and implement 5 useful tricks: check power of 2, count set bits, swap without temp, find single number, and toggle nth bit",
+            "Solve 'Single Number', 'Number of 1 Bits', and 'Counting Bits' from NeetCode 150",
+            "Solve 'Reverse Bits' and 'Missing Number' using bitwise operations",
+            "Read the cp-algorithms bitwise operations article and solve 'Sum of Two Integers' without using + or - operators",
+          ],
           estHours: 4,
           row: 1,
           resources: [
@@ -692,6 +853,13 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "GCD/LCM, primes and sieves, modular arithmetic, matrix rotation, coordinate tricks.",
           why: "Occasional but unavoidable; the sieve and modular arithmetic also underpin hashing and crypto.",
+          tasks: [
+            "Read the cp-algorithms Sieve of Eratosthenes article and implement the sieve from scratch to find all primes up to N",
+            "Solve 'Rotate Image', 'Spiral Matrix', and 'Set Matrix Zeroes' from NeetCode 150",
+            "Implement GCD (Euclidean algorithm) and LCM from scratch, then solve 'Greatest Common Divisor of Strings'",
+            "Read the cp-algorithms modular arithmetic article and implement modular exponentiation (fast power)",
+            "Solve 'Happy Number' and 'Plus One' to practice number manipulation patterns",
+          ],
           estHours: 5,
           row: 1,
           resources: [
@@ -718,6 +886,13 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Prefix function/KMP for pattern matching, rolling hashes, Z-function, palindrome tricks.",
           why: "Substring-search questions become mechanical once you own the prefix function.",
+          tasks: [
+            "Read the cp-algorithms prefix function & KMP article and implement KMP pattern matching from scratch",
+            "Watch the KMP visual explanation video and trace the failure function table for the pattern 'ABABAC' on paper",
+            "Read the cp-algorithms rolling hashes article and implement Rabin-Karp string matching from scratch",
+            "Solve 'Find the Index of the First Occurrence in a String' (LeetCode #28) using both KMP and Rabin-Karp",
+            "Solve 'Longest Happy Prefix' and 'Repeated Substring Pattern' using the prefix function",
+          ],
           estHours: 6,
           resources: [
             {
@@ -743,6 +918,13 @@ export const dsaRoadmap: Roadmap = {
           summary:
             "Range queries with point updates in O(log n): segment trees, lazy propagation, binary indexed trees.",
           why: "Beyond-interview territory that occasionally appears in hard rounds; core competitive-programming kit.",
+          tasks: [
+            "Read the cp-algorithms segment tree article and implement a segment tree from scratch supporting range sum queries and point updates",
+            "Add lazy propagation to your segment tree to support range updates in O(log n)",
+            "Read the cp-algorithms Fenwick tree article and implement a BIT (Binary Indexed Tree) from scratch for prefix sums",
+            "Solve 3 problems from the CSES Range Queries section: 'Range Sum Queries II', 'Range Minimum Queries I', and 'Range Update Queries'",
+            "Solve 'Range Sum Query - Mutable' (LeetCode #307) using both your segment tree and Fenwick tree implementations",
+          ],
           estHours: 8,
           resources: [
             {
