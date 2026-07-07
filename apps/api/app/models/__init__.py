@@ -46,10 +46,26 @@ class ActivityType(str, enum.Enum):
     dsa_solved = "dsa_solved"
 
 
+class TodoPriority(str, enum.Enum):
+    low = "low"
+    medium = "medium"
+    high = "high"
+
+
+class TodoStatus(str, enum.Enum):
+    pending = "pending"
+    done = "done"
+
+
 from app.models.activity import DailyActivityLog  # noqa: E402
+from app.models.bookmark import Bookmark  # noqa: E402
 from app.models.dsa_problem import DsaProblem  # noqa: E402
+from app.models.microlearning import Microlearning  # noqa: E402
 from app.models.project import Project  # noqa: E402
+from app.models.todo import Todo  # noqa: E402
 from app.models.topic import Topic  # noqa: E402
+from app.models.user_resource import UserResource  # noqa: E402
+from app.models.user_setting import UserSetting  # noqa: E402
 
 __all__ = [
     "Base",
@@ -59,8 +75,15 @@ __all__ = [
     "ProjectStatus",
     "ProblemStatus",
     "ActivityType",
+    "TodoPriority",
+    "TodoStatus",
     "Topic",
     "Project",
     "DsaProblem",
     "DailyActivityLog",
+    "Todo",
+    "Microlearning",
+    "UserResource",
+    "UserSetting",
+    "Bookmark",
 ]

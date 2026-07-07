@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import StatusPill from "@/components/ui/StatusPill";
 import TopicChat from "@/components/TopicChat";
 import { findNode, PILLAR_SLUGS, projectsForNode } from "@/content";
 import type { ResourceType } from "@/content/types";
-import { get, put } from "@/lib/api";
-import type { DsaProblem, TopicProgress, TopicStatus } from "@/types";
+import { del, get, post, put } from "@/lib/api";
+import type { Bookmark, DsaProblem, TopicProgress, TopicStatus, UserResource } from "@/types";
 
 const RESOURCE_ICONS: Record<ResourceType, string> = {
   video: "▶️",
@@ -59,6 +59,20 @@ export default function TopicDetailPage() {
   const [notesError, setNotesError] = useState(false);
 
   const [dsaProblems, setDsaProblems] = useState<DsaProblem[]>([]);
+  const [bookmarked, setBookmarked] = useState(false);
+  const [bookmarkId, setBookmarkId] = useState<string | null>(null);
+  const [userResources, setUserResources] = useState<UserResource[]>([]);
+  const [newResTitle, setNewResTitle] = useState("");
+  const [newResUrl, setNewResUrl] = useState("");
+  const [newResNote, setNewResNote] = useState("");
+
+  const loadResources = useCallback(async () => {
+    try {
+      setUserResources(
+        await get<UserResource[]>(`/resources?topic_slug=${params.slug}`)
+      );
+    } catch {}
+  }, [params.slug]);
 
   const tasks = found?.node.tasks ?? [];
   const { checks, toggle, done: tasksDone } = useTaskChecks(
@@ -81,7 +95,14 @@ export default function TopicDetailPage() {
         .then(setDsaProblems)
         .catch(() => {});
     }
-  }, [params.slug, params.pillar]);
+    loadResources();
+    get<Bookmark[]>("/bookmarks")
+      .then((bks) => {
+        const found = bks.find((b) => b.slug === params.slug);
+        if (found) { setBookmarked(true); setBookmarkId(found.id); }
+      })
+      .catch(() => {});
+  }, [params.slug, params.pillar, loadResources]);
 
   if (!pillar || !found) {
     return (
@@ -139,7 +160,28 @@ export default function TopicDetailPage() {
         <Link href={`/roadmap/${params.pillar}`} className="text-xs text-zinc-400">
           ← {stageTitle}
         </Link>
-        <h1 className="mt-1 text-2xl font-bold">{node.title}</h1>
+        <div className="mt-1 flex items-center gap-2">
+          <h1 className="text-2xl font-bold">{node.title}</h1>
+          <button
+            onClick={async () => {
+              try {
+                if (bookmarked && bookmarkId) {
+                  await del(`/bookmarks/${bookmarkId}`);
+                  setBookmarked(false);
+                  setBookmarkId(null);
+                } else {
+                  const bk = await post<Bookmark>("/bookmarks", { slug: params.slug, type: "topic" });
+                  setBookmarked(true);
+                  setBookmarkId(bk.id);
+                }
+              } catch {}
+            }}
+            className={`text-lg transition ${bookmarked ? "text-indigo-500" : "text-zinc-300 hover:text-indigo-400"}`}
+            aria-label={bookmarked ? "Remove bookmark" : "Bookmark"}
+          >
+            {bookmarked ? "🔖" : "🏷️"}
+          </button>
+        </div>
         <p className="mt-1 text-xs text-zinc-400">~{node.estHours}h of focused work</p>
       </div>
 
@@ -266,6 +308,91 @@ export default function TopicDetailPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section>
+        <h2 className="mb-2 text-xs font-semibold tracking-wide text-zinc-400 uppercase">
+          Your resources
+        </h2>
+        {userResources.length > 0 && (
+          <ul className="mb-3 space-y-2">
+            {userResources.map((r) => (
+              <li key={r.id}>
+                <div className="flex items-start gap-3 rounded-xl border border-zinc-200 px-4 py-3 dark:border-zinc-800">
+                  <span className="mt-0.5">🔗</span>
+                  <a
+                    href={r.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="min-w-0 flex-1"
+                  >
+                    <span className="block text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400">
+                      {r.title}
+                    </span>
+                    {r.note && (
+                      <span className="block text-xs text-zinc-400">{r.note}</span>
+                    )}
+                  </a>
+                  <span className="text-zinc-300">↗</span>
+                  <button
+                    onClick={async () => {
+                      try {
+                        await del(`/resources/${r.id}`);
+                        setUserResources((rs) => rs.filter((x) => x.id !== r.id));
+                      } catch {}
+                    }}
+                    className="px-1 text-zinc-300 hover:text-rose-500"
+                    aria-label={`Delete ${r.title}`}
+                  >
+                    ✕
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if (!newResTitle.trim() || !newResUrl.trim()) return;
+            try {
+              await post<UserResource>("/resources", {
+                topic_slug: params.slug,
+                title: newResTitle.trim(),
+                url: newResUrl.trim(),
+                note: newResNote.trim() || null,
+              });
+              setNewResTitle("");
+              setNewResUrl("");
+              setNewResNote("");
+              await loadResources();
+            } catch {}
+          }}
+          className="flex flex-wrap gap-2"
+        >
+          <input
+            value={newResTitle}
+            onChange={(e) => setNewResTitle(e.target.value)}
+            placeholder="Title"
+            className="min-w-0 flex-1 basis-full rounded-lg border border-zinc-300 px-3 py-2 text-sm sm:basis-auto dark:border-zinc-700 dark:bg-zinc-900"
+          />
+          <input
+            value={newResUrl}
+            onChange={(e) => setNewResUrl(e.target.value)}
+            placeholder="https://…"
+            type="url"
+            className="min-w-0 flex-1 basis-full rounded-lg border border-zinc-300 px-3 py-2 text-sm sm:basis-auto dark:border-zinc-700 dark:bg-zinc-900"
+          />
+          <input
+            value={newResNote}
+            onChange={(e) => setNewResNote(e.target.value)}
+            placeholder="Note (optional)"
+            className="min-w-0 flex-1 basis-full rounded-lg border border-zinc-300 px-3 py-2 text-sm sm:basis-auto dark:border-zinc-700 dark:bg-zinc-900"
+          />
+          <button className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
+            Add
+          </button>
+        </form>
       </section>
 
       {dsaProblems.length > 0 && (

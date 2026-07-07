@@ -48,3 +48,84 @@ export interface Streak {
   active_today: boolean;
 }
 
+export type TodoPriority = "low" | "medium" | "high";
+export type TodoStatus = "pending" | "done";
+
+export interface Todo {
+  id: string;
+  title: string;
+  description: string | null;
+  status: TodoStatus;
+  priority: TodoPriority;
+  due_date: string | null;
+  category: string | null;
+  position: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Microlearning {
+  id: string;
+  title: string;
+  body: string;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserResource {
+  id: string;
+  topic_slug: string;
+  title: string;
+  url: string;
+  note: string | null;
+  created_at: string;
+}
+
+export interface HeatmapDay {
+  date: string;
+  count: number;
+}
+
+export interface ActivityEntry {
+  id: string;
+  activity_date: string;
+  activity_type: ActivityType;
+  topic_id: string | null;
+  dsa_problem_id: string | null;
+  created_at: string;
+}
+
+export interface WeeklySummary {
+  total_activities: number;
+  days_active: number;
+  activities_by_type: Record<string, number>;
+}
+
+export interface WeekComparison {
+  total: number;
+  days_active: number;
+}
+
+export interface AnalyticsSummary {
+  daily_counts: HeatmapDay[];
+  by_type: Record<string, number>;
+  by_pillar: Record<string, number>;
+  this_week: WeekComparison;
+  last_week: WeekComparison;
+  totals: {
+    activities: number;
+    topics_done: number;
+    topics_in_progress: number;
+    dsa_solved: number;
+    projects_done: number;
+  };
+}
+
+export interface Bookmark {
+  id: string;
+  slug: string;
+  type: "topic" | "project";
+  created_at: string;
+}
+

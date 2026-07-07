@@ -5,8 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import StatusPill from "@/components/ui/StatusPill";
 import { findNodeGlobal, getProject, PILLAR_LABELS, pillarToSlug } from "@/content";
-import { get, post } from "@/lib/api";
-import type { Project } from "@/types";
+import { del, get, post } from "@/lib/api";
+import type { Bookmark, Project } from "@/types";
 
 export default function ProjectDetailPage() {
   const params = useParams<{ slug: string }>();
@@ -14,6 +14,8 @@ export default function ProjectDetailPage() {
   const project = getProject(params.slug);
   const [alreadyStarted, setAlreadyStarted] = useState(false);
   const [starting, setStarting] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
+  const [bookmarkId, setBookmarkId] = useState<string | null>(null);
 
   useEffect(() => {
     get<Project[]>("/projects")
@@ -23,7 +25,13 @@ export default function ProjectDetailPage() {
         }
       })
       .catch(() => {});
-  }, [project]);
+    get<Bookmark[]>("/bookmarks")
+      .then((bks) => {
+        const found = bks.find((b) => b.slug === params.slug);
+        if (found) { setBookmarked(true); setBookmarkId(found.id); }
+      })
+      .catch(() => {});
+  }, [project, params.slug]);
 
   if (!project) {
     return (
@@ -62,7 +70,28 @@ export default function ProjectDetailPage() {
         <Link href="/projects" className="text-xs text-zinc-400">
           ← Projects
         </Link>
-        <h1 className="mt-1 text-2xl font-bold">{project.title}</h1>
+        <div className="mt-1 flex items-center gap-2">
+          <h1 className="text-2xl font-bold">{project.title}</h1>
+          <button
+            onClick={async () => {
+              try {
+                if (bookmarked && bookmarkId) {
+                  await del(`/bookmarks/${bookmarkId}`);
+                  setBookmarked(false);
+                  setBookmarkId(null);
+                } else {
+                  const bk = await post<Bookmark>("/bookmarks", { slug: params.slug, type: "project" });
+                  setBookmarked(true);
+                  setBookmarkId(bk.id);
+                }
+              } catch {}
+            }}
+            className={`text-lg transition ${bookmarked ? "text-indigo-500" : "text-zinc-300 hover:text-indigo-400"}`}
+            aria-label={bookmarked ? "Remove bookmark" : "Bookmark"}
+          >
+            {bookmarked ? "🔖" : "🏷️"}
+          </button>
+        </div>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-zinc-400">
           <StatusPill value={project.difficulty} />
           <span>{PILLAR_LABELS[project.pillar]}</span>

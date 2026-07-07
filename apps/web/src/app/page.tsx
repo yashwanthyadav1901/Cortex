@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import ActivityHeatmap from "@/components/ActivityHeatmap";
+import DailyRecap from "@/components/DailyRecap";
+import SavedList from "@/components/SavedList";
 import TodayFocus from "@/components/TodayFocus";
+import WeeklyGoal from "@/components/WeeklyGoal";
 import { allNodes, PILLAR_LABELS, pillarToSlug, ROADMAPS } from "@/content";
 import type { RoadmapNode } from "@/content/types";
 import { get, post } from "@/lib/api";
@@ -134,6 +138,12 @@ export default function Dashboard() {
         )}
       </header>
 
+      <DailyRecap />
+
+      <ActivityHeatmap />
+
+      <WeeklyGoal />
+
       <TodayFocus today={today} progress={progress} onStatusChange={load} />
 
       {carryOver.length > 0 && (
@@ -210,6 +220,8 @@ export default function Dashboard() {
           ))}
         </div>
       </section>
+
+      <SavedList />
 
       <section>
         <h2 className="mb-2 text-xs font-semibold tracking-wide text-zinc-400 uppercase">

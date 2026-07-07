@@ -3,4 +3,7 @@ export const NAV_ITEMS = [
   { href: "/roadmap", label: "Roadmap", icon: "🗺️" },
   { href: "/projects", label: "Projects", icon: "🛠️" },
   { href: "/dsa", label: "DSA", icon: "🧩" },
+  { href: "/todos", label: "Todos", icon: "✅" },
+  { href: "/learnings", label: "Learnings", icon: "📝" },
+  { href: "/analytics", label: "Analytics", icon: "📊" },
 ] as const;

@@ -18,7 +18,7 @@ export default function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex min-w-14 flex-col items-center gap-0.5 px-2 py-2 text-[11px] ${
+              className={`flex min-w-0 flex-col items-center gap-0.5 px-1 py-2 text-[10px] ${
                 active
                   ? "font-semibold text-indigo-600 dark:text-indigo-400"
                   : "text-zinc-500 dark:text-zinc-400"

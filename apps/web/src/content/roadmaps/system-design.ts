@@ -38,6 +38,28 @@ export const systemDesignRoadmap: Roadmap = {
               url: "https://www.youtube.com/watch?v=EkNq4TrHP_U",
               type: "video",
             },
+            {
+              title: "How DNS works — comic explanation",
+              url: "https://howdns.works/",
+              type: "article",
+              note: "Visual comic-style walkthrough that makes DNS memorable",
+            },
+            {
+              title: "System Design Primer — DNS section",
+              url: "https://github.com/donnemartin/system-design-primer#domain-name-system",
+              type: "article",
+            },
+            {
+              title: "Networking fundamentals — Gaurav Sen",
+              url: "https://www.youtube.com/watch?v=35XjX0e_tec",
+              type: "video",
+            },
+            {
+              title: "Computer Networking: A Top-Down Approach (Kurose & Ross)",
+              url: "https://gaia.cs.umass.edu/kurose_ross/index.php",
+              type: "book",
+              note: "The standard university networking textbook — ch. 1-3 cover this topic",
+            },
           ],
         },
         {
@@ -68,6 +90,28 @@ export const systemDesignRoadmap: Roadmap = {
               title: "HTTP/2 vs HTTP/3 — Hussein Nasser",
               url: "https://www.youtube.com/watch?v=ai8cf0hZ9cQ",
               type: "video",
+            },
+            {
+              title: "HTTP caching — MDN",
+              url: "https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching",
+              type: "docs",
+              note: "HTTP caching headers are critical for system design CDN discussions",
+            },
+            {
+              title: "How HTTPS works — comic explanation",
+              url: "https://howhttps.works/",
+              type: "article",
+            },
+            {
+              title: "High Performance Browser Networking — Ilya Grigorik",
+              url: "https://hpbn.co/",
+              type: "book",
+              note: "Free online book — chapters on HTTP/2 and TLS are exceptional",
+            },
+            {
+              title: "TLS handshake deep dive — Cloudflare blog",
+              url: "https://blog.cloudflare.com/rfc-8446-aka-tls-1-3/",
+              type: "article",
             },
           ],
         },
@@ -105,6 +149,22 @@ export const systemDesignRoadmap: Roadmap = {
               title: "WebSockets API — MDN",
               url: "https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API",
               type: "docs",
+            },
+            {
+              title: "REST vs GraphQL vs gRPC — ByteByteGo",
+              url: "https://www.youtube.com/watch?v=hkXzsB8D_mo",
+              type: "video",
+            },
+            {
+              title: "API design guide — Google Cloud",
+              url: "https://cloud.google.com/apis/design",
+              type: "docs",
+              note: "Google's opinionated guide — great for resource-oriented API thinking",
+            },
+            {
+              title: "Best practices for REST API design — Stack Overflow blog",
+              url: "https://stackoverflow.blog/2020/03/02/best-practices-for-rest-api-design/",
+              type: "article",
             },
           ],
           projectSlugs: ["realtime-chat"],
@@ -144,6 +204,27 @@ export const systemDesignRoadmap: Roadmap = {
               url: "https://github.com/donnemartin/system-design-primer#load-balancer",
               type: "article",
             },
+            {
+              title: "NGINX load balancing docs",
+              url: "https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/",
+              type: "docs",
+            },
+            {
+              title: "Load balancing — Gaurav Sen",
+              url: "https://www.youtube.com/watch?v=K0Ta65OqQkY",
+              type: "video",
+            },
+            {
+              title: "What is Elastic Load Balancing? — AWS docs",
+              url: "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html",
+              type: "docs",
+            },
+            {
+              title: "Introduction to modern network load balancing — Envoy blog",
+              url: "https://blog.envoyproxy.io/introduction-to-modern-network-load-balancing-and-proxying-a57f6ff80236",
+              type: "article",
+              note: "Excellent deep dive on L4 vs L7 from the Envoy creator",
+            },
           ],
         },
         {
@@ -174,6 +255,26 @@ export const systemDesignRoadmap: Roadmap = {
             {
               title: "System Design Primer — CDN section",
               url: "https://github.com/donnemartin/system-design-primer#content-delivery-network",
+              type: "article",
+            },
+            {
+              title: "CDN explained — ByteByteGo",
+              url: "https://www.youtube.com/watch?v=RI9np1LWzqw",
+              type: "video",
+            },
+            {
+              title: "Amazon CloudFront — how it works",
+              url: "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html",
+              type: "docs",
+            },
+            {
+              title: "High Performance Browser Networking — caching chapter",
+              url: "https://hpbn.co/optimizing-application-delivery/",
+              type: "book",
+            },
+            {
+              title: "Reverse proxy vs load balancer — NGINX blog",
+              url: "https://www.nginx.com/resources/glossary/reverse-proxy-vs-load-balancer/",
               type: "article",
             },
           ],
@@ -207,6 +308,27 @@ export const systemDesignRoadmap: Roadmap = {
               url: "https://www.cloudflare.com/learning/bots/what-is-rate-limiting/",
               type: "article",
             },
+            {
+              title: "System Design Primer — rate limiting",
+              url: "https://github.com/donnemartin/system-design-primer#rate-limiting",
+              type: "article",
+            },
+            {
+              title: "Rate limiting — Gaurav Sen",
+              url: "https://www.youtube.com/watch?v=mhUQe4BKZXs",
+              type: "video",
+            },
+            {
+              title: "Redis rate limiting pattern",
+              url: "https://redis.io/glossary/rate-limiting/",
+              type: "docs",
+              note: "Shows sliding window implementation with Redis commands",
+            },
+            {
+              title: "System design: rate limiter — Alex Xu (ByteByteGo book ch. 4)",
+              url: "https://bytebytego.com/courses/system-design-interview/design-a-rate-limiter",
+              type: "course",
+            },
           ],
           projectSlugs: ["rate-limiter-service"],
         },
@@ -238,6 +360,26 @@ export const systemDesignRoadmap: Roadmap = {
               title: "What is an API gateway? — ByteByteGo",
               url: "https://www.youtube.com/watch?v=6ULyxuHKxg8",
               type: "video",
+            },
+            {
+              title: "Service discovery in microservices — Gaurav Sen",
+              url: "https://www.youtube.com/watch?v=s1dGAJAB0ME",
+              type: "video",
+            },
+            {
+              title: "Amazon API Gateway — developer guide",
+              url: "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html",
+              type: "docs",
+            },
+            {
+              title: "Kong API gateway docs — overview",
+              url: "https://docs.konghq.com/gateway/latest/",
+              type: "docs",
+            },
+            {
+              title: "Building Microservices — Sam Newman (ch. 5, service discovery)",
+              url: "https://samnewman.io/books/building_microservices_2nd_edition/",
+              type: "book",
             },
           ],
         },
@@ -276,6 +418,27 @@ export const systemDesignRoadmap: Roadmap = {
               url: "https://sqlbolt.com/",
               type: "practice",
             },
+            {
+              title: "How do indexes work in PostgreSQL? — Hussein Nasser",
+              url: "https://www.youtube.com/watch?v=-qNSXPUFwXo",
+              type: "video",
+            },
+            {
+              title: "DDIA ch. 3 — Storage and Retrieval (B-trees & LSM trees)",
+              url: "https://dataintensive.net/",
+              type: "book",
+              note: "Explains B-tree internals, WAL, and how they differ from LSM trees",
+            },
+            {
+              title: "SQL vs NoSQL — ByteByteGo",
+              url: "https://www.youtube.com/watch?v=Q_9cFgzZr8Q",
+              type: "video",
+            },
+            {
+              title: "Database indexing explained — Gaurav Sen",
+              url: "https://www.youtube.com/watch?v=lYh6LrSIDvY",
+              type: "video",
+            },
           ],
         },
         {
@@ -307,6 +470,26 @@ export const systemDesignRoadmap: Roadmap = {
               url: "https://dataintensive.net/",
               type: "book",
               note: "THE system design book. Read it cover to cover over this whole stage.",
+            },
+            {
+              title: "Introduction to NoSQL — Martin Fowler (talk)",
+              url: "https://www.youtube.com/watch?v=qI_g07C_Q5I",
+              type: "video",
+            },
+            {
+              title: "Cassandra data modeling — DataStax docs",
+              url: "https://docs.datastax.com/en/cassandra-oss/3.x/cassandra/dml/dmlIntro.html",
+              type: "docs",
+            },
+            {
+              title: "Redis data types and abstractions — official docs",
+              url: "https://redis.io/docs/latest/develop/data-types/",
+              type: "docs",
+            },
+            {
+              title: "NoSQL design for DynamoDB — AWS docs",
+              url: "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-general-nosql-design.html",
+              type: "docs",
             },
           ],
         },
@@ -340,6 +523,26 @@ export const systemDesignRoadmap: Roadmap = {
               url: "https://www.youtube.com/watch?v=bI8Ry6GhMSE",
               type: "video",
             },
+            {
+              title: "Master-slave vs master-master replication — Gaurav Sen",
+              url: "https://www.youtube.com/watch?v=RIcNswROzCc",
+              type: "video",
+            },
+            {
+              title: "System Design Primer — replication section",
+              url: "https://github.com/donnemartin/system-design-primer#replication",
+              type: "article",
+            },
+            {
+              title: "MySQL replication — official docs",
+              url: "https://dev.mysql.com/doc/refman/8.0/en/replication.html",
+              type: "docs",
+            },
+            {
+              title: "Replication under the hood — PlanetScale blog",
+              url: "https://planetscale.com/blog/mysql-replication",
+              type: "article",
+            },
           ],
         },
         {
@@ -370,6 +573,27 @@ export const systemDesignRoadmap: Roadmap = {
             {
               title: "How Discord stores trillions of messages",
               url: "https://discord.com/blog/how-discord-stores-trillions-of-messages",
+              type: "article",
+            },
+            {
+              title: "Database sharding explained — Gaurav Sen",
+              url: "https://www.youtube.com/watch?v=5faMjKn0HTk",
+              type: "video",
+            },
+            {
+              title: "Consistent hashing and sharding — ByteByteGo",
+              url: "https://bytebytego.com/courses/system-design-interview/design-consistent-hashing",
+              type: "course",
+            },
+            {
+              title: "Vitess — how YouTube scaled MySQL",
+              url: "https://vitess.io/docs/overview/whatisvitess/",
+              type: "docs",
+              note: "Real-world sharding middleware used by YouTube, Slack, and others",
+            },
+            {
+              title: "System Design Primer — database section",
+              url: "https://github.com/donnemartin/system-design-primer#database",
               type: "article",
             },
           ],
@@ -405,6 +629,27 @@ export const systemDesignRoadmap: Roadmap = {
               url: "https://jepsen.io/consistency",
               type: "article",
             },
+            {
+              title: "Transactions explained — Hussein Nasser",
+              url: "https://www.youtube.com/watch?v=wHUOeXbZCYA",
+              type: "video",
+            },
+            {
+              title: "DDIA ch. 9 — Consistency and Consensus",
+              url: "https://dataintensive.net/",
+              type: "book",
+              note: "Covers 2PC, distributed transactions, and consensus protocols",
+            },
+            {
+              title: "Distributed transactions: the Saga pattern — microservices.io",
+              url: "https://microservices.io/patterns/data/saga.html",
+              type: "article",
+            },
+            {
+              title: "A beginner's guide to ACID and transactions — Vlad Mihalcea",
+              url: "https://vladmihalcea.com/a-beginners-guide-to-acid-and-database-transactions/",
+              type: "article",
+            },
           ],
         },
         {
@@ -436,6 +681,28 @@ export const systemDesignRoadmap: Roadmap = {
               title: "System Design Primer — cache section",
               url: "https://github.com/donnemartin/system-design-primer#cache",
               type: "article",
+            },
+            {
+              title: "Redis documentation — overview",
+              url: "https://redis.io/docs/latest/",
+              type: "docs",
+              note: "The most popular caching store — know its data structures and eviction policies",
+            },
+            {
+              title: "Caching pitfalls every developer should know — ByteByteGo",
+              url: "https://www.youtube.com/watch?v=wh98s0XhMmQ",
+              type: "video",
+            },
+            {
+              title: "Amazon ElastiCache — caching strategies",
+              url: "https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/Strategies.html",
+              type: "docs",
+            },
+            {
+              title: "LRU cache — LeetCode problem 146",
+              url: "https://leetcode.com/problems/lru-cache/",
+              type: "practice",
+              note: "Classic coding interview problem that tests cache implementation skills",
             },
           ],
           projectSlugs: ["url-shortener", "lru-lfu-cache"],
@@ -474,6 +741,27 @@ export const systemDesignRoadmap: Roadmap = {
               url: "https://www.youtube.com/watch?v=BHqjEjzAicA",
               type: "video",
             },
+            {
+              title: "DDIA ch. 9 — Consistency and Consensus",
+              url: "https://dataintensive.net/",
+              type: "book",
+            },
+            {
+              title: "CAP theorem — Gaurav Sen",
+              url: "https://www.youtube.com/watch?v=kwCFHLbIhak",
+              type: "video",
+            },
+            {
+              title: "System Design Primer — CAP theorem",
+              url: "https://github.com/donnemartin/system-design-primer#cap-theorem",
+              type: "article",
+            },
+            {
+              title: "Harvest, Yield, and Scalable Tolerant Systems — Brewer & Fox",
+              url: "https://radlab.cs.berkeley.edu/people/fox/static/pubs/pdf/c18.pdf",
+              type: "article",
+              note: "The original harvest/yield paper that refines CAP thinking",
+            },
           ],
         },
         {
@@ -506,6 +794,23 @@ export const systemDesignRoadmap: Roadmap = {
               title: "MIT 6.824 — Raft lectures",
               url: "https://pdos.csail.mit.edu/6.824/",
               type: "course",
+            },
+            {
+              title: "Raft — understandable consensus (paper)",
+              url: "https://raft.github.io/raft.pdf",
+              type: "article",
+              note: "The original Raft paper — more readable than Paxos by design",
+            },
+            {
+              title: "Paxos vs Raft — Hussein Nasser",
+              url: "https://www.youtube.com/watch?v=s8JqcZtvnsM",
+              type: "video",
+            },
+            {
+              title: "etcd — how it uses Raft",
+              url: "https://etcd.io/docs/v3.5/learning/",
+              type: "docs",
+              note: "etcd is Kubernetes' brain — see Raft in production",
             },
           ],
           projectSlugs: ["raft-kv-store"],
@@ -540,6 +845,23 @@ export const systemDesignRoadmap: Roadmap = {
               url: "https://queue.acm.org/detail.cfm?id=2745385",
               type: "article",
             },
+            {
+              title: "Distributed systems lectures — Martin Kleppmann (Cambridge)",
+              url: "https://www.youtube.com/playlist?list=PLeKd45zvjcDFUEv_ohr_HdUFe97RItdiB",
+              type: "course",
+              note: "Full university lecture series — lectures 7-8 cover clocks and ordering",
+            },
+            {
+              title: "Time, Clocks, and the Ordering of Events — Lamport (original paper)",
+              url: "https://lamport.azurewebsites.net/pubs/time-clocks.pdf",
+              type: "article",
+              note: "The seminal 1978 paper — foundational to all distributed systems",
+            },
+            {
+              title: "Vector clocks — Riak docs",
+              url: "https://docs.riak.com/riak/kv/latest/learn/concepts/causal-context/index.html",
+              type: "docs",
+            },
           ],
         },
         {
@@ -570,6 +892,28 @@ export const systemDesignRoadmap: Roadmap = {
               title: "Circuit breaker pattern — Martin Fowler",
               url: "https://martinfowler.com/bliki/CircuitBreaker.html",
               type: "article",
+            },
+            {
+              title: "Avoiding insurmountable queue backlogs — AWS Builders' Library",
+              url: "https://aws.amazon.com/builders-library/avoiding-insurmountable-queue-backlogs/",
+              type: "article",
+            },
+            {
+              title: "Idempotency — ByteByteGo",
+              url: "https://www.youtube.com/watch?v=4OuaONkZw1I",
+              type: "video",
+            },
+            {
+              title: "Resilience4j — circuit breaker docs",
+              url: "https://resilience4j.readme.io/docs/circuitbreaker",
+              type: "docs",
+              note: "Popular Java resilience library — good to see a real implementation",
+            },
+            {
+              title: "Implementing reliable delivery with idempotency — Brandur",
+              url: "https://brandur.org/idempotency-keys",
+              type: "article",
+              note: "Excellent deep dive on implementing idempotency at the application level",
             },
           ],
         },
@@ -602,6 +946,27 @@ export const systemDesignRoadmap: Roadmap = {
               title: "Kafka vs RabbitMQ — ByteByteGo",
               url: "https://www.youtube.com/watch?v=w8xWTIFU4C8",
               type: "video",
+            },
+            {
+              title: "RabbitMQ tutorials — official getting started",
+              url: "https://www.rabbitmq.com/tutorials",
+              type: "docs",
+            },
+            {
+              title: "Message queues — Gaurav Sen",
+              url: "https://www.youtube.com/watch?v=oUJbuFMyBDk",
+              type: "video",
+            },
+            {
+              title: "Amazon SQS — developer guide",
+              url: "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html",
+              type: "docs",
+              note: "The most-used managed queue — good to know SQS vs SNS vs Kinesis",
+            },
+            {
+              title: "System Design Primer — asynchronism section",
+              url: "https://github.com/donnemartin/system-design-primer#asynchronism",
+              type: "article",
             },
           ],
           projectSlugs: ["mini-message-queue"],
@@ -636,6 +1001,27 @@ export const systemDesignRoadmap: Roadmap = {
               title: "Kafka Streams docs",
               url: "https://kafka.apache.org/documentation/streams/",
               type: "docs",
+            },
+            {
+              title: "Event sourcing pattern — Microsoft Azure Architecture",
+              url: "https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing",
+              type: "article",
+            },
+            {
+              title: "CQRS pattern — Martin Fowler",
+              url: "https://martinfowler.com/bliki/CQRS.html",
+              type: "article",
+            },
+            {
+              title: "Event-driven architecture explained — ByteByteGo",
+              url: "https://www.youtube.com/watch?v=gOuAqRaDdHA",
+              type: "video",
+            },
+            {
+              title: "Designing Event-Driven Systems — Ben Stopford (free Confluent ebook)",
+              url: "https://www.confluent.io/resources/ebook/designing-event-driven-systems/",
+              type: "book",
+              note: "Free ebook covering event-driven patterns with Kafka",
             },
           ],
         },
@@ -673,6 +1059,27 @@ export const systemDesignRoadmap: Roadmap = {
               url: "https://microservices.io/patterns/index.html",
               type: "docs",
             },
+            {
+              title: "Microservices vs monolith — ByteByteGo",
+              url: "https://www.youtube.com/watch?v=lL_j7ilk7rc",
+              type: "video",
+            },
+            {
+              title: "Building Microservices — Sam Newman",
+              url: "https://samnewman.io/books/building_microservices_2nd_edition/",
+              type: "book",
+              note: "The standard reference for microservices architecture decisions",
+            },
+            {
+              title: "To microservices and back again — why Segment went monolith",
+              url: "https://www.infoq.com/news/2020/04/microservices-back-again/",
+              type: "article",
+            },
+            {
+              title: "Strangler fig application — Martin Fowler",
+              url: "https://martinfowler.com/bliki/StranglerFigApplication.html",
+              type: "article",
+            },
           ],
         },
         {
@@ -703,6 +1110,27 @@ export const systemDesignRoadmap: Roadmap = {
             {
               title: "OpenTelemetry docs — observability primer",
               url: "https://opentelemetry.io/docs/concepts/observability-primer/",
+              type: "docs",
+            },
+            {
+              title: "SLIs, SLOs, SLAs explained — Google Cloud",
+              url: "https://cloud.google.com/blog/products/devops-sre/sre-fundamentals-slis-slas-and-slos",
+              type: "article",
+            },
+            {
+              title: "Distributed tracing — Gaurav Sen",
+              url: "https://www.youtube.com/watch?v=idDu_jXqf4E",
+              type: "video",
+            },
+            {
+              title: "The Google SRE book (free online)",
+              url: "https://sre.google/sre-book/table-of-contents/",
+              type: "book",
+              note: "Chapters on monitoring, alerting, and SLOs are essential reading",
+            },
+            {
+              title: "Prometheus documentation — concepts",
+              url: "https://prometheus.io/docs/concepts/metric_types/",
               type: "docs",
             },
           ],
@@ -737,6 +1165,23 @@ export const systemDesignRoadmap: Roadmap = {
               url: "https://www.hellointerview.com/learn/system-design/deep-dives/numbers-to-know",
               type: "article",
             },
+            {
+              title: "Back-of-the-envelope estimation — ByteByteGo",
+              url: "https://www.youtube.com/watch?v=UC5xf8FbdJc",
+              type: "video",
+            },
+            {
+              title:
+                "System Design Interview — Alex Xu (ch. 2, back-of-the-envelope)",
+              url: "https://bytebytego.com/courses/system-design-interview/back-of-the-envelope-estimation",
+              type: "course",
+            },
+            {
+              title: "Numbers every programmer should know by year — Colin Scott",
+              url: "https://colin-scott.github.io/personal_website/research/interactive_latency.html",
+              type: "practice",
+              note: "Interactive visualization of latency numbers that updates by year",
+            },
           ],
         },
         {
@@ -768,6 +1213,27 @@ export const systemDesignRoadmap: Roadmap = {
               title: "Illustrated guide to OAuth and OIDC",
               url: "https://www.youtube.com/watch?v=t18YB3xDfXI",
               type: "video",
+            },
+            {
+              title: "JWT.io — decode, verify, and learn about JWTs",
+              url: "https://jwt.io/introduction",
+              type: "docs",
+            },
+            {
+              title: "Session vs JWT authentication — ByteByteGo",
+              url: "https://www.youtube.com/watch?v=fyTxwIa-1U0",
+              type: "video",
+            },
+            {
+              title: "OWASP cheat sheet series — authentication",
+              url: "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html",
+              type: "docs",
+              note: "Practical security checklists for authentication and session management",
+            },
+            {
+              title: "AWS IAM — how it works",
+              url: "https://docs.aws.amazon.com/IAM/latest/UserGuide/intro-structure.html",
+              type: "docs",
             },
           ],
         },
@@ -806,6 +1272,23 @@ export const systemDesignRoadmap: Roadmap = {
               url: "https://www.youtube.com/watch?v=JQDHz72OA3c",
               type: "video",
             },
+            {
+              title: "Designing a URL shortener — Gaurav Sen",
+              url: "https://www.youtube.com/watch?v=fMZMm_0ZhK4",
+              type: "video",
+            },
+            {
+              title:
+                "System Design Interview — Alex Xu (ch. 8, URL shortener)",
+              url: "https://bytebytego.com/courses/system-design-interview/design-a-url-shortener",
+              type: "course",
+            },
+            {
+              title: "Implementing a URL shortener — highscalability.com",
+              url: "http://highscalability.com/blog/2014/7/14/bitly-lessons-learned-building-a-distributed-system-that-han.html",
+              type: "article",
+              note: "Real lessons from Bitly on building at scale",
+            },
           ],
           projectSlugs: ["url-shortener"],
         },
@@ -839,6 +1322,28 @@ export const systemDesignRoadmap: Roadmap = {
               title: "Design Discord — ByteByteGo style walkthrough",
               url: "https://www.youtube.com/watch?v=cqAmqiEOSC8",
               type: "video",
+            },
+            {
+              title: "Designing a chat system — Gaurav Sen",
+              url: "https://www.youtube.com/watch?v=zKPNUMkwOJE",
+              type: "video",
+            },
+            {
+              title:
+                "System Design Interview — Alex Xu (ch. 12, chat system)",
+              url: "https://bytebytego.com/courses/system-design-interview/design-a-chat-system",
+              type: "course",
+            },
+            {
+              title: "How Slack works — Slack engineering blog",
+              url: "https://slack.engineering/flannel-an-application-level-edge-cache-to-make-slack-scale/",
+              type: "article",
+              note: "How Slack uses edge caching to deliver messages at scale",
+            },
+            {
+              title: "WhatsApp system architecture — highscalability.com",
+              url: "http://highscalability.com/blog/2014/2/26/the-whatsapp-architecture-facebook-bought-for-19-billion.html",
+              type: "article",
             },
           ],
           projectSlugs: ["realtime-chat"],
@@ -874,6 +1379,27 @@ export const systemDesignRoadmap: Roadmap = {
               url: "https://www.infoq.com/presentations/Twitter-Timeline-Scalability/",
               type: "video",
             },
+            {
+              title: "Designing a news feed system — Gaurav Sen",
+              url: "https://www.youtube.com/watch?v=fMZMm_0ZhK4",
+              type: "video",
+            },
+            {
+              title:
+                "System Design Interview — Alex Xu (ch. 11, news feed)",
+              url: "https://bytebytego.com/courses/system-design-interview/design-a-news-feed-system",
+              type: "course",
+            },
+            {
+              title: "Facebook's news feed architecture — highscalability.com",
+              url: "http://highscalability.com/blog/2013/7/8/the-architecture-twitter-uses-to-deal-with-150m-active-users.html",
+              type: "article",
+            },
+            {
+              title: "System Design Primer — Twitter timeline solution",
+              url: "https://github.com/donnemartin/system-design-primer/blob/master/solutions/system_design/twitter/README.md",
+              type: "article",
+            },
           ],
           projectSlugs: ["news-feed-service"],
         },
@@ -908,6 +1434,27 @@ export const systemDesignRoadmap: Roadmap = {
               url: "https://netflixtechblog.com/",
               type: "article",
             },
+            {
+              title: "Designing YouTube — Gaurav Sen",
+              url: "https://www.youtube.com/watch?v=psQzyFfsUGU",
+              type: "video",
+            },
+            {
+              title: "System Design Interview vol. 2 — Alex Xu (ch. 10, YouTube)",
+              url: "https://bytebytego.com/courses/system-design-interview/design-youtube",
+              type: "course",
+            },
+            {
+              title: "How video streaming works — HLS and DASH explained",
+              url: "https://www.cloudflare.com/learning/video/what-is-streaming/",
+              type: "article",
+            },
+            {
+              title: "Amazon S3 — object storage for media",
+              url: "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html",
+              type: "docs",
+              note: "Understanding blob storage is key for any media-heavy design",
+            },
           ],
         },
         {
@@ -940,6 +1487,28 @@ export const systemDesignRoadmap: Roadmap = {
               title: "Bloom filters explained — ByteByteGo",
               url: "https://www.youtube.com/watch?v=V3pzxngeLqw",
               type: "video",
+            },
+            {
+              title: "Designing a web crawler — Gaurav Sen",
+              url: "https://www.youtube.com/watch?v=BKZxZwUgL3Y",
+              type: "video",
+            },
+            {
+              title:
+                "System Design Interview — Alex Xu (ch. 9, web crawler)",
+              url: "https://bytebytego.com/courses/system-design-interview/design-a-web-crawler",
+              type: "course",
+            },
+            {
+              title: "Scrapy architecture overview",
+              url: "https://docs.scrapy.org/en/latest/topics/architecture.html",
+              type: "docs",
+              note: "Real crawler framework architecture — useful reference for design discussions",
+            },
+            {
+              title: "Mercator: a scalable, extensible web crawler — research paper",
+              url: "https://courses.cs.washington.edu/courses/cse454/15wi/papers/mercator.pdf",
+              type: "article",
             },
           ],
           projectSlugs: ["web-crawler"],
@@ -974,6 +1543,28 @@ export const systemDesignRoadmap: Roadmap = {
               title: "Elasticsearch — search suggesters docs",
               url: "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html",
               type: "docs",
+            },
+            {
+              title: "Designing autocomplete — Gaurav Sen",
+              url: "https://www.youtube.com/watch?v=xrYTjaK5QVM",
+              type: "video",
+            },
+            {
+              title:
+                "System Design Interview — Alex Xu (ch. 13, autocomplete)",
+              url: "https://bytebytego.com/courses/system-design-interview/design-a-search-autocomplete-system",
+              type: "course",
+            },
+            {
+              title: "How search works — Google",
+              url: "https://www.google.com/search/howsearchworks/",
+              type: "article",
+              note: "High-level overview from Google on crawling, indexing, and serving",
+            },
+            {
+              title: "Trie data structure — implement autocomplete (LeetCode 208 + 211)",
+              url: "https://leetcode.com/problems/implement-trie-prefix-tree/",
+              type: "practice",
             },
           ],
           projectSlugs: ["trie-autocomplete"],
