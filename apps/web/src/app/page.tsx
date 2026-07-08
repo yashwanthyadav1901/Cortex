@@ -6,6 +6,7 @@ import ActivityHeatmap from "@/components/ActivityHeatmap";
 import DailyRecap from "@/components/DailyRecap";
 import FlashcardDue from "@/components/FlashcardDue";
 import SavedList from "@/components/SavedList";
+import StudyRecommendation from "@/components/StudyRecommendation";
 import TodayFocus from "@/components/TodayFocus";
 import WeeklyGoal from "@/components/WeeklyGoal";
 import { allNodes, PILLAR_LABELS, pillarToSlug, ROADMAPS } from "@/content";
@@ -146,6 +147,8 @@ export default function Dashboard() {
       <ActivityHeatmap />
 
       <WeeklyGoal />
+
+      <StudyRecommendation />
 
       <TodayFocus today={today} progress={progress} onStatusChange={load} />
 

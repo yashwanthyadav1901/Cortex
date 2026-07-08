@@ -348,3 +348,17 @@ class QuizOut(_OrmModel):
     total: int
     completed_at: datetime | None
     created_at: datetime
+
+
+# ---- Recommendations ----
+
+class RecommendRequest(BaseModel):
+    progress: dict[str, str]  # slug -> status
+    topics: list[dict]  # [{slug, title, pillar}]
+
+
+class RecommendationOut(BaseModel):
+    slug: str
+    title: str
+    pillar: str
+    reason: str

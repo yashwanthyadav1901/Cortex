@@ -165,3 +165,10 @@ export interface Quiz {
   created_at: string;
 }
 
+export interface Recommendation {
+  slug: string;
+  title: string;
+  pillar: string;
+  reason: string;
+}
+
