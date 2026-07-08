@@ -1,0 +1,50 @@
+# Render Blueprint for the Cortex API (apps/api).
+# Docs: https://render.com/docs/blueprint-spec
+#
+# The web frontend deploys to Vercel, not here — this file only describes the
+# FastAPI backend. Render reads this from the repo root; `rootDir` scopes all
+# commands to apps/api.
+services:
+  - type: web
+    name: cortex-api
+    runtime: python
+    rootDir: apps/api
+    plan: free
+    # Install the package (pulls deps from pyproject.toml) then apply migrations.
+    buildCommand: "pip install -e . && alembic upgrade head"
+    # Bind Render's injected $PORT — a hardcoded port won't receive traffic.
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      # Match the project's requires-python (>=3.11).
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      # Supabase Postgres. IMPORTANT: use the session/transaction POOLER string
+      # (aws-0-*.pooler.supabase.com), not the direct db.*.supabase.co:5432 host —
+      # the direct host is IPv6-only and Render is IPv4.
+      - key: DATABASE_URL
+        sync: false
+      # Supabase project URL — verifies login tokens via JWKS.
+      - key: SUPABASE_URL
+        sync: false
+      # Only for legacy HS256 projects; leave blank on ES256.
+      - key: SUPABASE_JWT_SECRET
+        sync: false
+      # The single account allowed through auth.
+      - key: ALLOWED_EMAIL
+        sync: false
+      # IANA tz anchoring streak/activity day boundaries.
+      - key: TIMEZONE
+        value: Asia/Kolkata
+      # Comma-separated allowed origins — set this to your Vercel URL
+      # (e.g. https://cortex.vercel.app) once the frontend is deployed.
+      - key: CORS_ORIGINS
+        sync: false
+      # ---- AI topic chat (use Anthropic in prod) ----
+      - key: LLM_PROVIDER
+        value: anthropic
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_MODEL
+        value: claude-sonnet-5
