@@ -44,7 +44,7 @@ export default function Quiz({ quiz, onComplete }: Props) {
   }
 
   if (showResult) {
-    const score = answers.reduce(
+    const score = answers.reduce<number>(
       (acc, a, i) => acc + (a === quiz.questions[i].correct ? 1 : 0),
       0
     );
