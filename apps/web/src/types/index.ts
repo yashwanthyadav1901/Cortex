@@ -129,3 +129,39 @@ export interface Bookmark {
   created_at: string;
 }
 
+export interface FlashcardDue {
+  id: string;
+  microlearning_id: string | null;
+  topic_slug: string | null;
+  title: string;
+  body: string;
+  tags: string[];
+  source: "microlearning" | "topic";
+  ease_factor: number;
+  interval_days: number;
+  repetitions: number;
+}
+
+export interface FlashcardStats {
+  due_today: number;
+  total: number;
+  reviewed_today: number;
+}
+
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  correct: number;
+  explanation: string;
+}
+
+export interface Quiz {
+  id: string;
+  topic_slug: string;
+  questions: QuizQuestion[];
+  score: number | null;
+  total: number;
+  completed_at: string | null;
+  created_at: string;
+}
+

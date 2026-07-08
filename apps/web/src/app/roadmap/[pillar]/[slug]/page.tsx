@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import QuizComponent from "@/components/Quiz";
 import StatusPill from "@/components/ui/StatusPill";
 import TopicChat from "@/components/TopicChat";
 import { findNode, PILLAR_SLUGS, projectsForNode } from "@/content";
 import type { ResourceType } from "@/content/types";
 import { del, get, post, put } from "@/lib/api";
-import type { Bookmark, DsaProblem, TopicProgress, TopicStatus, UserResource } from "@/types";
+import type { Bookmark, DsaProblem, Quiz, TopicProgress, TopicStatus, UserResource } from "@/types";
 
 const RESOURCE_ICONS: Record<ResourceType, string> = {
   video: "▶️",
@@ -65,6 +66,9 @@ export default function TopicDetailPage() {
   const [newResTitle, setNewResTitle] = useState("");
   const [newResUrl, setNewResUrl] = useState("");
   const [newResNote, setNewResNote] = useState("");
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [quizLoading, setQuizLoading] = useState(false);
+  const [lastScore, setLastScore] = useState<{ score: number; total: number } | null>(null);
 
   const loadResources = useCallback(async () => {
     try {
@@ -100,6 +104,12 @@ export default function TopicDetailPage() {
       .then((bks) => {
         const found = bks.find((b) => b.slug === params.slug);
         if (found) { setBookmarked(true); setBookmarkId(found.id); }
+      })
+      .catch(() => {});
+    get<Quiz[]>(`/quizzes?topic_slug=${params.slug}`)
+      .then((quizzes) => {
+        const completed = quizzes.find((q) => q.score !== null);
+        if (completed) setLastScore({ score: completed.score!, total: completed.total });
       })
       .catch(() => {});
   }, [params.slug, params.pillar, loadResources]);
@@ -185,26 +195,82 @@ export default function TopicDetailPage() {
         <p className="mt-1 text-xs text-zinc-400">~{node.estHours}h of focused work</p>
       </div>
 
-      <div className="flex gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-900">
-        {STATUS_OPTIONS.map((opt) => (
-          <button
-            key={opt.value}
-            disabled={saving}
-            onClick={() => updateStatus(opt.value)}
-            className={`flex-1 rounded-md py-2 text-sm font-medium transition ${
-              status === opt.value
-                ? opt.value === "done"
-                  ? "bg-emerald-500 text-white"
-                  : opt.value === "in_progress"
-                    ? "bg-blue-500 text-white"
-                    : "bg-white shadow-sm dark:bg-zinc-800"
-                : "text-zinc-500"
-            }`}
-          >
-            {opt.label}
-          </button>
-        ))}
+      <div className="flex items-center gap-2">
+        <div className="flex flex-1 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-900">
+          {STATUS_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              disabled={saving}
+              onClick={() => updateStatus(opt.value)}
+              className={`flex-1 rounded-md py-2 text-sm font-medium transition ${
+                status === opt.value
+                  ? opt.value === "done"
+                    ? "bg-emerald-500 text-white"
+                    : opt.value === "in_progress"
+                      ? "bg-blue-500 text-white"
+                      : "bg-white shadow-sm dark:bg-zinc-800"
+                  : "text-zinc-500"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={async () => {
+            if (quizLoading || quiz) return;
+            setQuizLoading(true);
+            try {
+              const result = await post<Quiz>("/quizzes/generate", {
+                topic_slug: node.slug,
+                title: node.title,
+                summary: node.summary,
+                why: node.why,
+                tasks: node.tasks ?? [],
+              });
+              setQuiz(result);
+            } catch {}
+            setQuizLoading(false);
+          }}
+          disabled={quizLoading}
+          className="flex shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium transition hover:border-indigo-400 hover:bg-indigo-50 disabled:opacity-50 dark:border-zinc-800 dark:hover:bg-indigo-950"
+        >
+          {quizLoading ? (
+            <span className="animate-spin">⏳</span>
+          ) : (
+            <>📝</>
+          )}
+          Quiz
+          {lastScore && !quiz && (
+            <span className="ml-1 rounded-full bg-indigo-100 px-1.5 text-xs font-bold text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+              {lastScore.score}/{lastScore.total}
+            </span>
+          )}
+        </button>
       </div>
+
+      {quiz && (
+        <section className="rounded-xl border border-indigo-200 p-4 dark:border-indigo-900">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-xs font-semibold tracking-wide text-zinc-400 uppercase">
+              Quiz: {node.title}
+            </h2>
+            <button
+              onClick={() => setQuiz(null)}
+              className="text-xs text-zinc-400 hover:text-zinc-600"
+            >
+              Close
+            </button>
+          </div>
+          <QuizComponent
+            quiz={quiz}
+            onComplete={(updated) => {
+              setLastScore({ score: updated.score!, total: updated.total });
+              setQuiz(null);
+            }}
+          />
+        </section>
+      )}
 
       <section>
         <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">

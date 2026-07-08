@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import ActivityHeatmap from "@/components/ActivityHeatmap";
 import DailyRecap from "@/components/DailyRecap";
+import FlashcardDue from "@/components/FlashcardDue";
 import SavedList from "@/components/SavedList";
 import TodayFocus from "@/components/TodayFocus";
 import WeeklyGoal from "@/components/WeeklyGoal";
@@ -139,6 +140,8 @@ export default function Dashboard() {
       </header>
 
       <DailyRecap />
+
+      <FlashcardDue />
 
       <ActivityHeatmap />
 

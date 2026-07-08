@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.auth import require_user
 from app.db import get_db
 from app.models import ActivityType, Topic, TopicStatus
+from app.models.flashcard_review import FlashcardReview
 from app.schemas import ProgressTopicOut, ProgressUpdate
 from app.services.activity import log_activity
 
@@ -52,5 +53,11 @@ def set_progress(slug: str, body: ProgressUpdate, db: Session = Depends(get_db))
         TopicStatus.done,
     ):
         log_activity(db, ActivityType.topic_study, topic_id=topic.id)
+    if body.notes:
+        existing = db.scalar(
+            select(FlashcardReview).where(FlashcardReview.topic_slug == slug)
+        )
+        if not existing:
+            db.add(FlashcardReview(topic_slug=slug))
     db.commit()
     return topic

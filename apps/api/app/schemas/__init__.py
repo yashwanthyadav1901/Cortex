@@ -299,3 +299,52 @@ class BookmarkOut(_OrmModel):
     slug: str
     type: str
     created_at: datetime
+
+
+# ---- Flashcards ----
+
+class FlashcardDue(BaseModel):
+    id: uuid.UUID
+    microlearning_id: uuid.UUID | None
+    topic_slug: str | None
+    title: str
+    body: str
+    tags: list[str]
+    source: Literal["microlearning", "topic"]
+    ease_factor: float
+    interval_days: int
+    repetitions: int
+
+
+class FlashcardReviewRequest(BaseModel):
+    quality: int  # 0-5 SM-2 grade
+
+
+class FlashcardStats(BaseModel):
+    due_today: int
+    total: int
+    reviewed_today: int
+
+
+# ---- Quizzes ----
+
+class QuizGenerateRequest(BaseModel):
+    topic_slug: str
+    title: str
+    summary: str | None = None
+    why: str | None = None
+    tasks: list[str] = []
+
+
+class QuizSubmitRequest(BaseModel):
+    answers: list[int]
+
+
+class QuizOut(_OrmModel):
+    id: uuid.UUID
+    topic_slug: str
+    questions: list[dict]
+    score: int | None
+    total: int
+    completed_at: datetime | None
+    created_at: datetime
