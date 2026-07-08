@@ -14,6 +14,7 @@
       "runtimeExecutable": "/Users/yashwanth/.nvm/versions/node/v22.18.0/bin/npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000,
+      "autoPort": true,
       "env": {
         "PATH": "/Users/yashwanth/.nvm/versions/node/v22.18.0/bin:/usr/bin:/bin"
       }
