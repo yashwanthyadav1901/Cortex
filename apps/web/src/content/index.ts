@@ -1,4 +1,5 @@
 import type { Pillar } from "@/types";
+export { BLOG_POSTS, getBlogPost } from "./blog";
 import { aiAgentsProjects } from "./projects/ai-agents";
 import { aiProjects } from "./projects/ai";
 import { dsaProjects } from "./projects/dsa";

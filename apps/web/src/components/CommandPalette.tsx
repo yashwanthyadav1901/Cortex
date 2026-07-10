@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { allNodes, PILLAR_LABELS, pillarToSlug, PROJECTS, ROADMAPS } from "@/content";
+import { allNodes, BLOG_POSTS, PILLAR_LABELS, pillarToSlug, PROJECTS, ROADMAPS } from "@/content";
 import { get } from "@/lib/api";
 import type { DsaProblem, Microlearning, Pillar, Todo } from "@/types";
 
@@ -15,7 +15,7 @@ interface SearchResult {
   titleMatch: boolean;
 }
 
-const CATEGORY_ORDER = ["Topics", "Projects", "Todos", "Learnings", "DSA"];
+const CATEGORY_ORDER = ["Topics", "Projects", "Blog", "Todos", "Learnings", "DSA"];
 const MAX_PER_GROUP = 5;
 
 function buildStaticItems(): SearchResult[] {
@@ -39,6 +39,16 @@ function buildStaticItems(): SearchResult[] {
       href: `/projects/${proj.slug}`,
       category: "Projects",
       icon: "🛠️",
+      titleMatch: false,
+    });
+  }
+  for (const post of BLOG_POSTS) {
+    items.push({
+      title: post.title,
+      subtitle: post.subtitle,
+      href: `/blog/${post.slug}`,
+      category: "Blog",
+      icon: "✍️",
       titleMatch: false,
     });
   }
