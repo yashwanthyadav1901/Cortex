@@ -3,17 +3,17 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import ActivityHeatmap from "@/components/ActivityHeatmap";
-import DailyRecap from "@/components/DailyRecap";
-import FlashcardDue from "@/components/FlashcardDue";
+import ChallengeCard from "@/components/ChallengeCard";
+import DeepThought from "@/components/DeepThought";
+
 import SavedList from "@/components/SavedList";
-import StudyRecommendation from "@/components/StudyRecommendation";
 import TodayFocus from "@/components/TodayFocus";
-import WeeklyGoal from "@/components/WeeklyGoal";
+
 import { allNodes, PILLAR_LABELS, pillarToSlug, ROADMAPS } from "@/content";
 import type { RoadmapNode } from "@/content/types";
-import { get, post } from "@/lib/api";
+import { get } from "@/lib/api";
 import { useTodayList } from "@/lib/todayList";
-import type { ActivityType, Pillar, Streak, TopicProgress } from "@/types";
+import type { Pillar, Streak, TopicProgress } from "@/types";
 
 interface CarryOverItem {
   pillar: Pillar;
@@ -80,12 +80,6 @@ export default function Dashboard() {
     load();
   }, [load]);
 
-  async function logActivity(type: ActivityType) {
-    try {
-      setStreak(await post<Streak>("/activity", { activity_type: type }));
-    } catch {}
-  }
-
   if (loading) return <p className="text-sm text-zinc-400">Loading…</p>;
 
   // Failed before anything loaded: show a retry screen instead of a
@@ -140,15 +134,9 @@ export default function Dashboard() {
         )}
       </header>
 
-      <DailyRecap />
+      <DeepThought />
 
-      <FlashcardDue />
-
-      <ActivityHeatmap />
-
-      <WeeklyGoal />
-
-      <StudyRecommendation />
+      <ChallengeCard />
 
       <TodayFocus today={today} progress={progress} onStatusChange={load} />
 
@@ -229,31 +217,7 @@ export default function Dashboard() {
 
       <SavedList />
 
-      <section>
-        <h2 className="mb-2 text-xs font-semibold tracking-wide text-zinc-400 uppercase">
-          Quick log
-        </h2>
-        <div className="grid grid-cols-3 gap-2">
-          {(
-            [
-              ["topic_study", "📚 Studied"],
-              ["project_work", "🛠️ Built"],
-              ["dsa_solved", "🧩 Solved"],
-            ] as [ActivityType, string][]
-          ).map(([type, label]) => (
-            <button
-              key={type}
-              onClick={() => logActivity(type)}
-              className="rounded-xl border border-zinc-200 py-3 text-sm font-medium hover:border-indigo-400 hover:bg-indigo-50 active:scale-95 dark:border-zinc-800 dark:hover:bg-indigo-950"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        <p className="mt-2 text-center text-xs text-zinc-400">
-          Marking roadmap topics and DSA problems logs activity automatically.
-        </p>
-      </section>
+      <ActivityHeatmap />
     </div>
   );
 }

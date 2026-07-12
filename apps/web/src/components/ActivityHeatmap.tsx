@@ -6,7 +6,15 @@ import type { HeatmapDay } from "@/types";
 
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-function getColor(count: number, dark: boolean): string {
+function toDateStr(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function getColor(count: number, isFuture: boolean, dark: boolean): string {
+  if (isFuture) return dark ? "#1c1c1e" : "#fafafa";
   if (count === 0) return dark ? "#27272a" : "#f4f4f5";
   if (count === 1) return dark ? "#065f46" : "#a7f3d0";
   if (count === 2) return dark ? "#059669" : "#34d399";
@@ -24,19 +32,21 @@ export default function ActivityHeatmap() {
   }, []);
 
   const today = new Date();
-  const oneYearAgo = new Date(today);
-  oneYearAgo.setFullYear(today.getFullYear() - 1);
-  oneYearAgo.setDate(oneYearAgo.getDate() - oneYearAgo.getDay());
+  const startOfYear = new Date(today.getFullYear(), 0, 1);
+  const startDate = new Date(startOfYear);
+  startDate.setDate(startDate.getDate() - startDate.getDay());
 
   const countMap = new Map(days.map((d) => [d.date, d.count]));
 
-  const weeks: { date: Date; count: number }[][] = [];
-  let currentWeek: { date: Date; count: number }[] = [];
-  const cursor = new Date(oneYearAgo);
+  const weeks: { date: Date; count: number; future: boolean }[][] = [];
+  let currentWeek: { date: Date; count: number; future: boolean }[] = [];
+  const endOfYear = new Date(today.getFullYear(), 11, 31);
+  const cursor = new Date(startDate);
 
-  while (cursor <= today) {
-    const dateStr = cursor.toISOString().slice(0, 10);
-    currentWeek.push({ date: new Date(cursor), count: countMap.get(dateStr) ?? 0 });
+  const todayStr = toDateStr(today);
+  while (cursor <= endOfYear) {
+    const dateStr = toDateStr(cursor);
+    currentWeek.push({ date: new Date(cursor), count: countMap.get(dateStr) ?? 0, future: dateStr > todayStr });
     if (currentWeek.length === 7) {
       weeks.push(currentWeek);
       currentWeek = [];
@@ -95,7 +105,7 @@ export default function ActivityHeatmap() {
                 width={cellSize}
                 height={cellSize}
                 rx={2}
-                fill={getColor(day.count, dark)}
+                fill={getColor(day.count, day.future, dark)}
                 onMouseEnter={(e) => {
                   const rect = (e.target as SVGRectElement).getBoundingClientRect();
                   setTooltip({
