@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { BLOG_POSTS } from "@/content/blog";
 import { del, get, patch, post } from "@/lib/api";
 import type { Microlearning } from "@/types";
 
@@ -18,20 +20,20 @@ function timeAgo(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString();
 }
 
-export default function LearningsPage() {
+type Tab = "learnings" | "blog";
+
+function MicrolearningsTab() {
   const [items, setItems] = useState<Microlearning[]>([]);
   const [filterTag, setFilterTag] = useState("");
   const [search, setSearch] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  // Add form
   const [newTitle, setNewTitle] = useState("");
   const [newBody, setNewBody] = useState("");
   const [newTags, setNewTags] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
 
-  // Edit form
   const [editTitle, setEditTitle] = useState("");
   const [editBody, setEditBody] = useState("");
   const [editTags, setEditTags] = useState("");
@@ -119,8 +121,7 @@ export default function LearningsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Microlearnings</h1>
+      <div className="flex justify-end">
         <button
           onClick={() => setShowAddForm(!showAddForm)}
           className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
@@ -129,7 +130,6 @@ export default function LearningsPage() {
         </button>
       </div>
 
-      {/* Add form */}
       {showAddForm && (
         <form
           onSubmit={addItem}
@@ -163,7 +163,6 @@ export default function LearningsPage() {
         </form>
       )}
 
-      {/* Filters */}
       <div className="flex flex-wrap gap-2">
         {allTags.length > 0 && (
           <select
@@ -187,7 +186,6 @@ export default function LearningsPage() {
         />
       </div>
 
-      {/* Notes list */}
       <div className="space-y-3">
         {visible.map((item) => {
           if (editingId === item.id) {
@@ -297,6 +295,74 @@ export default function LearningsPage() {
           </p>
         )}
       </div>
+    </div>
+  );
+}
+
+function BlogTab() {
+  return (
+    <div className="space-y-3">
+      {BLOG_POSTS.map((p) => (
+        <Link
+          key={p.slug}
+          href={`/blog/${p.slug}`}
+          className="block rounded-xl border border-zinc-200 p-5 transition hover:border-indigo-400 dark:border-zinc-800 dark:hover:border-indigo-500"
+        >
+          <h2 className="text-lg font-semibold">{p.title}</h2>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            {p.subtitle}
+          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-zinc-400">
+            <span>{p.date}</span>
+            <span>·</span>
+            <span>{p.readingTimeMins} min read</span>
+            <span>·</span>
+            <div className="flex gap-1.5">
+              {p.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded bg-zinc-100 px-1.5 py-0.5 dark:bg-zinc-800"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+export default function LearningsPage() {
+  const [tab, setTab] = useState<Tab>("learnings");
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-bold">Learnings</h1>
+
+      <div className="flex gap-1 rounded-lg border border-zinc-200 p-1 dark:border-zinc-800">
+        {(
+          [
+            ["learnings", "Microlearnings"],
+            ["blog", "Blog"],
+          ] as [Tab, string][]
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setTab(key)}
+            className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition ${
+              tab === key
+                ? "bg-indigo-600 text-white"
+                : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "learnings" ? <MicrolearningsTab /> : <BlogTab />}
     </div>
   );
 }
