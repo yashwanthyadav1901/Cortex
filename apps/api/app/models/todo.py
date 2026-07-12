@@ -32,6 +32,7 @@ class Todo(Base):
     due_date: Mapped[date | None]
     category: Mapped[str | None]
     position: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("0"))
+    completed_at: Mapped[datetime | None]
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         server_default=func.now(), onupdate=func.now()

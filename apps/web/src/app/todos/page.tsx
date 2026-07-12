@@ -3,9 +3,47 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import StatusPill from "@/components/ui/StatusPill";
 import { del, get, patch, post, put } from "@/lib/api";
-import type { Todo, TodoPriority, TodoStatus } from "@/types";
+import type { Todo, TodoLogs, TodoPriority, TodoStatus } from "@/types";
 
-export default function TodosPage() {
+type Tab = "todos" | "logs";
+
+/* ────────────────────── helpers ────────────────────── */
+
+function isOverdue(todo: Todo) {
+  return (
+    todo.due_date &&
+    todo.status === "pending" &&
+    new Date(todo.due_date) < new Date(new Date().toDateString())
+  );
+}
+
+function formatDuration(hours: number): string {
+  if (hours < 1) return `${Math.round(hours * 60)}m`;
+  if (hours < 24) return `${Math.round(hours)}h`;
+  const days = Math.round(hours / 24);
+  return `${days}d`;
+}
+
+function monthKey(dateStr: string): string {
+  const d = new Date(dateStr);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function monthLabel(key: string): string {
+  const [y, m] = key.split("-");
+  const d = new Date(Number(y), Number(m) - 1);
+  return d.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+}
+
+const PRIORITY_DOT: Record<string, string> = {
+  high: "bg-rose-500",
+  medium: "bg-amber-400",
+  low: "bg-zinc-300 dark:bg-zinc-600",
+};
+
+/* ────────────────────── TodosTab ────────────────────── */
+
+function TodosTab() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filterStatus, setFilterStatus] = useState<TodoStatus | "">("");
   const [filterPriority, setFilterPriority] = useState<TodoPriority | "">("");
@@ -14,20 +52,17 @@ export default function TodosPage() {
   const [showDone, setShowDone] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  // Add form state
   const [newTitle, setNewTitle] = useState("");
   const [newPriority, setNewPriority] = useState<TodoPriority>("medium");
   const [newDueDate, setNewDueDate] = useState("");
   const [newCategory, setNewCategory] = useState("");
 
-  // Edit form state
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editPriority, setEditPriority] = useState<TodoPriority>("medium");
   const [editDueDate, setEditDueDate] = useState("");
   const [editCategory, setEditCategory] = useState("");
 
-  // Drag state
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
 
@@ -77,14 +112,6 @@ export default function TodosPage() {
   }, [filterStatus, pendingTodos, doneTodos]);
 
   const showDoneSection = filterStatus !== "pending";
-
-  function isOverdue(todo: Todo) {
-    return (
-      todo.due_date &&
-      todo.status === "pending" &&
-      new Date(todo.due_date) < new Date(new Date().toDateString())
-    );
-  }
 
   async function addTodo(e: React.FormEvent) {
     e.preventDefault();
@@ -165,7 +192,6 @@ export default function TodosPage() {
     dragItem.current = null;
     dragOverItem.current = null;
 
-    // Optimistic update
     const newTodos = todos.map((t) => {
       const idx = ids.indexOf(t.id);
       return idx !== -1 ? { ...t, position: idx } : t;
@@ -299,9 +325,6 @@ export default function TodosPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Todos</h1>
-
-      {/* Filters */}
       <div className="flex flex-wrap gap-2">
         <select
           value={filterStatus}
@@ -344,7 +367,6 @@ export default function TodosPage() {
         />
       </div>
 
-      {/* Pending todos */}
       {filterStatus !== "done" && (
         <ul className="divide-y divide-zinc-100 dark:divide-zinc-900">
           {visible.map((t, i) => renderTodoItem(t, i, true))}
@@ -358,7 +380,6 @@ export default function TodosPage() {
         </ul>
       )}
 
-      {/* Done section */}
       {showDoneSection && doneTodos.length > 0 && filterStatus !== "done" && (
         <div>
           <button
@@ -375,7 +396,6 @@ export default function TodosPage() {
         </div>
       )}
 
-      {/* Done-only view */}
       {filterStatus === "done" && (
         <ul className="divide-y divide-zinc-100 dark:divide-zinc-900">
           {doneTodos.map((t, i) => renderTodoItem(t, i, false))}
@@ -387,7 +407,6 @@ export default function TodosPage() {
         </ul>
       )}
 
-      {/* Add form */}
       <form onSubmit={addTodo} className="flex flex-wrap gap-2">
         <input
           value={newTitle}
@@ -420,6 +439,173 @@ export default function TodosPage() {
           Add
         </button>
       </form>
+    </div>
+  );
+}
+
+/* ────────────────────── LogsTab ────────────────────── */
+
+function LogsTab() {
+  const [data, setData] = useState<TodoLogs | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    get<TodoLogs>("/todos/logs")
+      .then(setData)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p className="py-8 text-center text-sm text-zinc-400">Loading…</p>;
+  if (!data) return <p className="py-8 text-center text-sm text-zinc-400">Could not load logs.</p>;
+
+  const { todos, summary } = data;
+
+  const grouped = new Map<string, Todo[]>();
+  for (const t of todos) {
+    const key = monthKey(t.completed_at ?? t.updated_at);
+    const arr = grouped.get(key) ?? [];
+    arr.push(t);
+    grouped.set(key, arr);
+  }
+  const months = [...grouped.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+
+  const onTimeRate =
+    summary.on_time_count + summary.overdue_count > 0
+      ? Math.round(
+          (summary.on_time_count / (summary.on_time_count + summary.overdue_count)) * 100
+        )
+      : 100;
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { label: "Total Completed", value: summary.total_completed },
+          { label: "Avg Time", value: formatDuration(summary.avg_completion_hours) },
+          { label: "On-Time Rate", value: `${onTimeRate}%` },
+          { label: "This Month", value: summary.this_month },
+        ].map((stat) => (
+          <div
+            key={stat.label}
+            className="rounded-xl border border-zinc-200 px-4 py-3 dark:border-zinc-800"
+          >
+            <p className="text-xs text-zinc-400">{stat.label}</p>
+            <p className="text-lg font-bold text-zinc-800 dark:text-zinc-200">
+              {stat.value}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {todos.length === 0 ? (
+        <p className="py-8 text-center text-sm text-zinc-400">
+          No completed tasks yet. Complete a todo to see it here.
+        </p>
+      ) : (
+        <div className="space-y-6">
+          {months.map(([key, items]) => (
+            <section key={key}>
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                {monthLabel(key)} · {items.length} task{items.length === 1 ? "" : "s"}
+              </h3>
+              <ul className="space-y-1.5">
+                {items.map((todo) => {
+                  const doneAt = todo.completed_at ?? todo.updated_at;
+                  const hours =
+                    (new Date(doneAt).getTime() - new Date(todo.created_at).getTime()) /
+                    (1000 * 3600);
+                  const wasOverdue =
+                    todo.due_date && new Date(doneAt) > new Date(todo.due_date + "T23:59:59");
+                  const tookLong = hours > 7 * 24;
+
+                  return (
+                    <li
+                      key={todo.id}
+                      className="flex items-center gap-3 rounded-xl border border-zinc-200 px-4 py-2.5 dark:border-zinc-800"
+                    >
+                      <span
+                        className={`h-2 w-2 shrink-0 rounded-full ${PRIORITY_DOT[todo.priority]}`}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                          {todo.title}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400">
+                          <span>
+                            {new Date(doneAt).toLocaleDateString(undefined, {
+                              month: "short",
+                              day: "numeric",
+                            })}
+                          </span>
+                          {todo.category && (
+                            <span className="rounded bg-zinc-100 px-1.5 py-0.5 dark:bg-zinc-800">
+                              {todo.category}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <span className="shrink-0 text-xs font-medium text-zinc-400">
+                        {formatDuration(hours)}
+                      </span>
+                      {wasOverdue && (
+                        <span className="shrink-0 rounded bg-rose-100 px-1.5 py-0.5 text-xs font-medium text-rose-600 dark:bg-rose-950 dark:text-rose-400">
+                          late
+                        </span>
+                      )}
+                      {!wasOverdue && todo.due_date && (
+                        <span className="shrink-0 rounded bg-emerald-100 px-1.5 py-0.5 text-xs font-medium text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400">
+                          on time
+                        </span>
+                      )}
+                      {tookLong && !wasOverdue && (
+                        <span className="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:bg-amber-950 dark:text-amber-400">
+                          slow
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ────────────────────── Page ────────────────────── */
+
+export default function TodosPage() {
+  const [tab, setTab] = useState<Tab>("todos");
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-bold">Todos</h1>
+
+      <div className="flex gap-1 rounded-lg border border-zinc-200 p-1 dark:border-zinc-800">
+        {(
+          [
+            ["todos", "Todos"],
+            ["logs", "Logs"],
+          ] as [Tab, string][]
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setTab(key)}
+            className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition ${
+              tab === key
+                ? "bg-indigo-600 text-white"
+                : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "todos" ? <TodosTab /> : <LogsTab />}
     </div>
   );
 }

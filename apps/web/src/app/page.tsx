@@ -8,6 +8,7 @@ import DeepThought from "@/components/DeepThought";
 
 import SavedList from "@/components/SavedList";
 import TodayFocus from "@/components/TodayFocus";
+import TomorrowPlan from "@/components/TomorrowPlan";
 
 import { allNodes, PILLAR_LABELS, pillarToSlug, ROADMAPS } from "@/content";
 import type { RoadmapNode } from "@/content/types";
@@ -167,6 +168,8 @@ export default function Dashboard() {
           </ul>
         </section>
       )}
+
+      <TomorrowPlan />
 
       <section>
         <h2 className="mb-2 text-xs font-semibold tracking-wide text-zinc-400 uppercase">

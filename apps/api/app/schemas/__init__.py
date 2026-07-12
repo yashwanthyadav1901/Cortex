@@ -183,12 +183,28 @@ class TodoOut(_OrmModel):
     due_date: date | None
     category: str | None
     position: int
+    completed_at: datetime | None
     created_at: datetime
     updated_at: datetime
 
 
 class TodoReorder(BaseModel):
     ids: list[uuid.UUID]
+
+
+class TodoLogsSummary(BaseModel):
+    total_completed: int
+    avg_completion_hours: float
+    on_time_count: int
+    overdue_count: int
+    no_deadline_count: int
+    this_week: int
+    this_month: int
+
+
+class TodoLogsOut(BaseModel):
+    todos: list[TodoOut]
+    summary: TodoLogsSummary
 
 
 # ---- Microlearnings ----

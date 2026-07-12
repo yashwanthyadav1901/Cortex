@@ -60,8 +60,24 @@ export interface Todo {
   due_date: string | null;
   category: string | null;
   position: number;
+  completed_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface TodoLogsSummary {
+  total_completed: number;
+  avg_completion_hours: number;
+  on_time_count: number;
+  overdue_count: number;
+  no_deadline_count: number;
+  this_week: number;
+  this_month: number;
+}
+
+export interface TodoLogs {
+  todos: Todo[];
+  summary: TodoLogsSummary;
 }
 
 export interface Microlearning {
