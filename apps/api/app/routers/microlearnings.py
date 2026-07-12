@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 from app.auth import require_user
 from app.db import get_db
 from app.models import Microlearning
-from app.models.flashcard_review import FlashcardReview
 from app.schemas import MicrolearningCreate, MicrolearningOut, MicrolearningUpdate
 
 router = APIRouter(
@@ -45,8 +44,6 @@ def list_microlearnings(
 def create_microlearning(body: MicrolearningCreate, db: Session = Depends(get_db)):
     ml = Microlearning(**body.model_dump())
     db.add(ml)
-    db.flush()
-    db.add(FlashcardReview(microlearning_id=ml.id))
     db.commit()
     return ml
 
