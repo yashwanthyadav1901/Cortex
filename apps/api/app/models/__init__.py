@@ -59,8 +59,8 @@ class TodoStatus(str, enum.Enum):
 
 from app.models.activity import DailyActivityLog  # noqa: E402
 from app.models.bookmark import Bookmark  # noqa: E402
+from app.models.challenge_day import ChallengeDay  # noqa: E402
 from app.models.dsa_problem import DsaProblem  # noqa: E402
-from app.models.flashcard_review import FlashcardReview  # noqa: E402
 from app.models.microlearning import Microlearning  # noqa: E402
 from app.models.project import Project  # noqa: E402
 from app.models.quiz import Quiz  # noqa: E402
@@ -83,9 +83,9 @@ __all__ = [
     "Project",
     "DsaProblem",
     "DailyActivityLog",
+    "ChallengeDay",
     "Todo",
     "Microlearning",
-    "FlashcardReview",
     "Quiz",
     "UserResource",
     "UserSetting",

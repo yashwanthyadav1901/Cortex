@@ -129,24 +129,6 @@ export interface Bookmark {
   created_at: string;
 }
 
-export interface FlashcardDue {
-  id: string;
-  microlearning_id: string | null;
-  topic_slug: string | null;
-  title: string;
-  body: string;
-  tags: string[];
-  source: "microlearning" | "topic";
-  ease_factor: number;
-  interval_days: number;
-  repetitions: number;
-}
-
-export interface FlashcardStats {
-  due_today: number;
-  total: number;
-  reviewed_today: number;
-}
 
 export interface QuizQuestion {
   question: string;
@@ -170,5 +152,38 @@ export interface Recommendation {
   title: string;
   pillar: string;
   reason: string;
+}
+
+export interface ChallengeDay {
+  id: string;
+  challenge_date: string;
+  day_number: number;
+  wake_up_early: boolean;
+  workout: boolean;
+  learning: boolean;
+  deep_work: boolean;
+  reading: boolean;
+  water: boolean;
+  meditation: boolean;
+  all_complete: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ChallengeGridDay {
+  date: string;
+  complete: boolean;
+  day_number: number;
+}
+
+export interface ChallengeStatus {
+  day_number: number;
+  total_completed: number;
+  today_complete: boolean;
+  current_streak: number;
+  best_streak: number;
+  elapsed_days: number;
+  start_date: string;
+  days: ChallengeGridDay[];
 }
 

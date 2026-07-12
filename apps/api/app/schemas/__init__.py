@@ -301,31 +301,6 @@ class BookmarkOut(_OrmModel):
     created_at: datetime
 
 
-# ---- Flashcards ----
-
-class FlashcardDue(BaseModel):
-    id: uuid.UUID
-    microlearning_id: uuid.UUID | None
-    topic_slug: str | None
-    title: str
-    body: str
-    tags: list[str]
-    source: Literal["microlearning", "topic"]
-    ease_factor: float
-    interval_days: int
-    repetitions: int
-
-
-class FlashcardReviewRequest(BaseModel):
-    quality: int  # 0-5 SM-2 grade
-
-
-class FlashcardStats(BaseModel):
-    due_today: int
-    total: int
-    reviewed_today: int
-
-
 # ---- Quizzes ----
 
 class QuizGenerateRequest(BaseModel):
@@ -362,3 +337,48 @@ class RecommendationOut(BaseModel):
     title: str
     pillar: str
     reason: str
+
+
+# ---- 75 Hard Challenge ----
+
+class ChallengeDayOut(_OrmModel):
+    id: uuid.UUID
+    challenge_date: date
+    day_number: int
+    wake_up_early: bool
+    workout: bool
+    learning: bool
+    deep_work: bool
+    reading: bool
+    water: bool
+    meditation: bool
+    all_complete: bool
+    created_at: datetime
+    updated_at: datetime
+
+
+class ChallengeDayUpdate(BaseModel):
+    wake_up_early: bool | None = None
+    workout: bool | None = None
+    learning: bool | None = None
+    deep_work: bool | None = None
+    reading: bool | None = None
+    water: bool | None = None
+    meditation: bool | None = None
+
+
+class ChallengeGridDay(BaseModel):
+    date: date
+    complete: bool
+    day_number: int
+
+
+class ChallengeStatusOut(BaseModel):
+    day_number: int
+    total_completed: int
+    today_complete: bool
+    current_streak: int
+    best_streak: int
+    elapsed_days: int
+    start_date: date
+    days: list[ChallengeGridDay]
