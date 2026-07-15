@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import ActivityTrend from "@/components/analytics/ActivityTrend";
+import CountUp from "@/components/ui/CountUp";
+import PageSkeleton from "@/components/ui/PageSkeleton";
 import { allNodes, PILLAR_LABELS, ROADMAPS } from "@/content";
 import { get } from "@/lib/api";
 import type { AnalyticsSummary, Pillar, Streak } from "@/types";
@@ -37,7 +39,7 @@ export default function AnalyticsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="text-sm text-zinc-400">Loading…</p>;
+  if (loading) return <PageSkeleton variant="stats" />;
   if (!data) return <p className="text-sm text-zinc-400">Couldn&apos;t load analytics.</p>;
 
   const totalTopics = (Object.keys(ROADMAPS) as Pillar[]).reduce(
@@ -55,7 +57,7 @@ export default function AnalyticsPage() {
         : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="stagger-children space-y-6">
       <h1 className="text-2xl font-bold">Analytics</h1>
 
       {/* Summary Cards */}
@@ -72,7 +74,13 @@ export default function AnalyticsPage() {
           >
             <div className="flex items-center gap-2">
               <span>{card.icon}</span>
-              <span className="text-2xl font-bold">{card.value}</span>
+              <span className="text-2xl font-bold">
+                {typeof card.value === "number" ? (
+                  <CountUp value={card.value} />
+                ) : (
+                  card.value
+                )}
+              </span>
             </div>
             <p className="mt-1 text-xs text-zinc-400">{card.label}</p>
           </div>
@@ -109,7 +117,7 @@ export default function AnalyticsPage() {
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
                   <div
-                    className={`h-full rounded-full ${PILLAR_COLORS[pillar]} transition-all`}
+                    className={`h-full rounded-full ${PILLAR_COLORS[pillar]} transition-[width] duration-500 ease-out`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>

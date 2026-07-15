@@ -9,14 +9,34 @@ import {
   getLevelProgress,
   type ChallengeTaskKey,
 } from "@/content/challenge";
+import PageSkeleton from "@/components/ui/PageSkeleton";
 import { get, patch, post } from "@/lib/api";
 import type { ChallengeDay, ChallengeStatus } from "@/types";
+
+// Confetti burst when all of a day's tasks are done — once per day,
+// skipped for users who prefer reduced motion.
+async function celebrateDay(dayNumber: number) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const guard = `cortex:75hard-confetti:${dayNumber}`;
+  try {
+    if (localStorage.getItem(guard)) return;
+    localStorage.setItem(guard, "1");
+  } catch {}
+  const confetti = (await import("canvas-confetti")).default;
+  const colors = ["#4f46e5", "#10b981", "#a5b4fc", "#6ee7b7"];
+  confetti({ particleCount: 90, spread: 75, origin: { y: 0.7 }, colors });
+  setTimeout(
+    () =>
+      confetti({ particleCount: 50, spread: 100, origin: { y: 0.6 }, colors }),
+    250
+  );
+}
 
 function ContractPage({ onStart }: { onStart: () => void }) {
   const [agreed, setAgreed] = useState(false);
 
   return (
-    <div className="mx-auto max-w-lg space-y-8 py-8">
+    <div className="stagger-children mx-auto max-w-lg space-y-8 py-8">
       <div className="text-center">
         <span className="text-5xl">💪</span>
         <h1 className="mt-4 text-3xl font-bold">75 Hard</h1>
@@ -103,7 +123,7 @@ function ContractPage({ onStart }: { onStart: () => void }) {
       <button
         onClick={onStart}
         disabled={!agreed}
-        className="w-full rounded-xl bg-indigo-600 py-3.5 text-sm font-bold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40"
+        className="pressable w-full rounded-xl bg-indigo-600 py-3.5 text-sm font-bold text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40"
       >
         Start 75 Hard Challenge
       </button>
@@ -124,9 +144,12 @@ function TrackingPage({
   const level = getLevel(dayNumber);
   const levelProgress = getLevelProgress(dayNumber);
   const tasksComplete = CHALLENGE_TASKS.filter((t) => today[t.key]).length;
+  // Only the task the user just tapped gets the check animation, so
+  // already-done tasks don't all pop on page load.
+  const [justToggled, setJustToggled] = useState<ChallengeTaskKey | null>(null);
 
   return (
-    <div className="space-y-6">
+    <div className="stagger-children space-y-6">
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">75 Hard</h1>
@@ -158,7 +181,7 @@ function TrackingPage({
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-white/30 dark:bg-black/20">
           <div
-            className="h-full rounded-full transition-all"
+            className="h-full rounded-full transition-[width] duration-500 ease-out"
             style={{
               width: `${levelProgress.percent}%`,
               backgroundColor:
@@ -198,11 +221,15 @@ function TrackingPage({
         <ul className="space-y-2">
           {CHALLENGE_TASKS.map((task) => {
             const checked = today[task.key];
+            const animate = checked && justToggled === task.key;
             return (
               <li key={task.key}>
                 <button
-                  onClick={() => onToggle(task.key)}
-                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition ${
+                  onClick={() => {
+                    setJustToggled(task.key);
+                    onToggle(task.key);
+                  }}
+                  className={`pressable flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition ${
                     checked
                       ? "bg-emerald-50 dark:bg-emerald-950/40"
                       : "hover:bg-zinc-50 dark:hover:bg-zinc-900"
@@ -213,7 +240,7 @@ function TrackingPage({
                       checked
                         ? "border-emerald-500 bg-emerald-500 text-white"
                         : "border-zinc-300 dark:border-zinc-600"
-                    }`}
+                    } ${animate ? "animate-check-reward" : ""}`}
                   >
                     {checked && (
                       <svg
@@ -227,6 +254,8 @@ function TrackingPage({
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           d="M5 13l4 4L19 7"
+                          pathLength={24}
+                          className={animate ? "animate-check-draw" : undefined}
                         />
                       </svg>
                     )}
@@ -395,12 +424,15 @@ export default function SeventyFiveHardPage() {
     const updated = await patch<ChallengeDay>("/challenge/today", {
       [key]: !today[key],
     });
+    if (updated.all_complete && !today.all_complete) {
+      celebrateDay(updated.day_number);
+    }
     setToday(updated);
     const s = await get<ChallengeStatus>("/challenge/status");
     setStatus(s);
   }
 
-  if (loading) return <p className="text-sm text-zinc-400">Loading…</p>;
+  if (loading) return <PageSkeleton variant="list" />;
 
   if (!started) return <ContractPage onStart={handleStart} />;
 

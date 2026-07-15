@@ -106,6 +106,14 @@ export default function ActivityHeatmap() {
                 height={cellSize}
                 rx={2}
                 fill={getColor(day.count, day.future, dark)}
+                className={day.count > 0 ? "animate-heat-fill" : undefined}
+                style={
+                  day.count > 0
+                    ? ({
+                        "--heat-delay": `${Math.min(wi * 12, 500)}ms`,
+                      } as React.CSSProperties)
+                    : undefined
+                }
                 onMouseEnter={(e) => {
                   const rect = (e.target as SVGRectElement).getBoundingClientRect();
                   setTooltip({

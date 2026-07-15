@@ -42,7 +42,7 @@ export default function RoadmapIndex() {
             <Link
               key={pillar}
               href={`/roadmap/${pillarToSlug(pillar)}`}
-              className="block rounded-xl border border-zinc-200 p-4 transition hover:border-indigo-400 dark:border-zinc-800"
+              className="card-lift block rounded-xl border border-zinc-200 p-4 hover:border-indigo-400 dark:border-zinc-800"
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{PILLAR_ICONS[pillar]}</span>

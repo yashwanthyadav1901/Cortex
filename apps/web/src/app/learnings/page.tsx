@@ -306,7 +306,7 @@ function BlogTab() {
         <Link
           key={p.slug}
           href={`/blog/${p.slug}`}
-          className="block rounded-xl border border-zinc-200 p-5 transition hover:border-indigo-400 dark:border-zinc-800 dark:hover:border-indigo-500"
+          className="card-lift block rounded-xl border border-zinc-200 p-5 hover:border-indigo-400 dark:border-zinc-800 dark:hover:border-indigo-500"
         >
           <h2 className="text-lg font-semibold">{p.title}</h2>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">

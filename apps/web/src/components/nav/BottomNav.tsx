@@ -27,7 +27,7 @@ export default function BottomNav() {
         />
       )}
       {showMore && (
-        <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-40 mx-3 rounded-xl border border-zinc-200 bg-white p-2 shadow-lg md:hidden dark:border-zinc-700 dark:bg-zinc-900">
+        <div className="animate-toast-in fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-40 mx-3 rounded-xl border border-zinc-200 bg-white p-2 shadow-lg md:hidden dark:border-zinc-700 dark:bg-zinc-900">
           {moreItems.map((item) => {
             const active =
               item.href === "/"
@@ -62,7 +62,7 @@ export default function BottomNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex min-w-0 flex-col items-center gap-0.5 px-1 py-2 text-[10px] ${
+                className={`pressable flex min-w-0 flex-col items-center gap-0.5 px-1 py-2 text-[10px] transition-colors duration-150 ${
                   active
                     ? "font-semibold text-indigo-600 dark:text-indigo-400"
                     : "text-zinc-500 dark:text-zinc-400"
@@ -75,7 +75,7 @@ export default function BottomNav() {
           })}
           <button
             onClick={() => setShowMore(!showMore)}
-            className={`flex min-w-0 flex-col items-center gap-0.5 px-1 py-2 text-[10px] ${
+            className={`pressable flex min-w-0 flex-col items-center gap-0.5 px-1 py-2 text-[10px] transition-colors duration-150 ${
               moreActive || showMore
                 ? "font-semibold text-indigo-600 dark:text-indigo-400"
                 : "text-zinc-500 dark:text-zinc-400"

@@ -359,7 +359,7 @@ export default function TopicDetailPage() {
                 href={r.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start gap-3 rounded-xl border border-zinc-200 px-4 py-3 transition hover:border-indigo-400 dark:border-zinc-800"
+                className="card-lift flex items-start gap-3 rounded-xl border border-zinc-200 px-4 py-3 hover:border-indigo-400 dark:border-zinc-800"
               >
                 <span className="mt-0.5">{RESOURCE_ICONS[r.type]}</span>
                 <span className="min-w-0">
@@ -537,7 +537,7 @@ export default function TopicDetailPage() {
               <li key={p.slug}>
                 <Link
                   href={`/projects/${p.slug}`}
-                  className="flex items-center gap-3 rounded-xl border border-zinc-200 px-4 py-3 transition hover:border-indigo-400 dark:border-zinc-800"
+                  className="card-lift flex items-center gap-3 rounded-xl border border-zinc-200 px-4 py-3 hover:border-indigo-400 dark:border-zinc-800"
                 >
                   <span className="min-w-0 flex-1">
                     <span className="block text-sm font-medium">{p.title}</span>

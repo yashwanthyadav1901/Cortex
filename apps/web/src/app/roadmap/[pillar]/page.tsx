@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import RoadmapFlow from "@/components/roadmap/RoadmapFlow";
+import { SkeletonList } from "@/components/ui/Skeleton";
 import { allNodes, PILLAR_SLUGS, ROADMAPS } from "@/content";
 import { get } from "@/lib/api";
 import type { DsaProblem, TopicProgress } from "@/types";
@@ -72,7 +73,7 @@ export default function RoadmapPillarPage() {
         </div>
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
           <div
-            className="h-full rounded-full bg-indigo-500 transition-all"
+            className="h-full rounded-full bg-indigo-500 transition-[width] duration-500 ease-out"
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -86,7 +87,7 @@ export default function RoadmapPillarPage() {
       {loaded ? (
         <RoadmapFlow roadmap={roadmap} progress={progress} />
       ) : (
-        <p className="py-8 text-center text-sm text-zinc-400">Loading…</p>
+        <SkeletonList rows={5} className="py-2" />
       )}
     </div>
   );

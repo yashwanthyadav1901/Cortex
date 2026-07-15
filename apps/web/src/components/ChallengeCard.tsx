@@ -25,7 +25,7 @@ export default function ChallengeCard() {
     return (
       <Link
         href="/75hard"
-        className="block rounded-xl border border-zinc-200 px-4 py-3 transition hover:border-indigo-400 dark:border-zinc-800"
+        className="card-lift block rounded-xl border border-zinc-200 px-4 py-3 hover:border-indigo-400 dark:border-zinc-800"
       >
         <div className="flex items-center gap-2">
           <span className="text-lg">💪</span>
@@ -49,7 +49,7 @@ export default function ChallengeCard() {
   return (
     <Link
       href="/75hard"
-      className={`block rounded-xl border px-4 py-3 transition hover:border-indigo-400 ${
+      className={`card-lift block rounded-xl border px-4 py-3 hover:border-indigo-400 ${
         today.all_complete
           ? "border-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.15)] dark:border-emerald-500 dark:shadow-[0_0_12px_rgba(16,185,129,0.1)]"
           : "border-zinc-200 dark:border-zinc-800"
@@ -80,7 +80,7 @@ export default function ChallengeCard() {
       <div className="mt-2 flex items-center gap-3">
         <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
           <div
-            className="h-full rounded-full bg-indigo-500 transition-all"
+            className="h-full rounded-full bg-indigo-500 transition-[width] duration-500 ease-out"
             style={{ width: `${pct}%` }}
           />
         </div>

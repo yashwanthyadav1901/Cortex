@@ -23,7 +23,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[80vh] max-w-sm flex-col justify-center">
+    <div className="animate-fade-in-up mx-auto flex min-h-[80vh] max-w-sm flex-col justify-center">
       <h1 className="mb-1 text-2xl font-bold">🧠 Cortex</h1>
       <p className="mb-8 text-sm text-zinc-500">Sign in to your learning HQ.</p>
       <form onSubmit={signIn} className="space-y-3">
@@ -47,9 +47,16 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={busy}
-          className="w-full rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50"
+          className="pressable w-full rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50"
         >
-          {busy ? "Signing in…" : "Sign in"}
+          {busy ? (
+            <span className="inline-flex items-center gap-2">
+              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+              Signing in…
+            </span>
+          ) : (
+            "Sign in"
+          )}
         </button>
       </form>
     </div>

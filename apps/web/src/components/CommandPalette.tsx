@@ -206,9 +206,9 @@ export default function CommandPalette() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh]" onClick={close}>
-      <div className="fixed inset-0 bg-black/50" />
+      <div className="animate-fade-in fixed inset-0 bg-black/50 backdrop-blur-sm" />
       <div
-        className="relative z-10 w-full max-w-lg rounded-xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-950"
+        className="animate-scale-in relative z-10 w-full max-w-lg rounded-xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-950"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
@@ -251,7 +251,7 @@ export default function CommandPalette() {
                   data-idx={i}
                   onClick={() => navigate(r)}
                   onMouseEnter={() => setSelectedIndex(i)}
-                  className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition ${
+                  className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors duration-100 ${
                     i === selectedIndex
                       ? "bg-indigo-50 dark:bg-indigo-950"
                       : "hover:bg-zinc-50 dark:hover:bg-zinc-900"
