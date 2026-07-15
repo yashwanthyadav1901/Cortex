@@ -18,6 +18,16 @@
       "env": {
         "PATH": "/Users/yashwanth/.nvm/versions/node/v22.18.0/bin:/usr/bin:/bin"
       }
+    },
+    {
+      "name": "cortex-web-verify",
+      "cwd": "apps/web",
+      "runtimeExecutable": "/Users/yashwanth/.nvm/versions/node/v22.18.0/bin/npx",
+      "runtimeArgs": ["next", "dev", "-p", "3457"],
+      "port": 3457,
+      "env": {
+        "PATH": "/Users/yashwanth/.nvm/versions/node/v22.18.0/bin:/usr/bin:/bin"
+      }
     }
   ]
 }

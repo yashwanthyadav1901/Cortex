@@ -4,6 +4,7 @@ import "./globals.css";
 import ApiErrorToast from "@/components/ApiErrorToast";
 import CommandPalette from "@/components/CommandPalette";
 import AuthGuard from "@/components/AuthGuard";
+import PageTransition from "@/components/PageTransition";
 import BottomNav from "@/components/nav/BottomNav";
 import Sidebar from "@/components/nav/Sidebar";
 
@@ -34,7 +35,7 @@ export default function RootLayout({
           <div className="flex">
             <Sidebar />
             <main className="mx-auto w-full max-w-2xl flex-1 px-4 pt-6 pb-24 md:px-8 md:pb-10">
-              {children}
+              <PageTransition>{children}</PageTransition>
             </main>
           </div>
           <BottomNav />

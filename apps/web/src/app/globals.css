@@ -4,6 +4,12 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Motion tokens */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 400ms;
 }
 
 @theme inline {
@@ -23,5 +29,354 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* ---------- Keyframes ---------- */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+}
+
+@keyframes check-pop {
+  0% {
+    transform: scale(0.6);
+  }
+  55% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes check-draw {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ring-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.25));
+  }
+  50% {
+    opacity: 0.75;
+    filter: drop-shadow(0 0 18px rgba(99, 102, 241, 0.55));
+  }
+}
+
+@keyframes heat-fill {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes line-draw {
+  from {
+    stroke-dashoffset: var(--line-length, 1000);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---------- Animation utilities ---------- */
+
+.animate-fade-in {
+  animation: fade-in var(--dur-base) var(--ease-out-quart) both;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up var(--dur-slow) var(--ease-out-quart) both;
+}
+
+.animate-scale-in {
+  animation: scale-in var(--dur-fast) var(--ease-out-quart) both;
+}
+
+.animate-toast-in {
+  animation: toast-in var(--dur-base) var(--ease-out-quart) both;
+}
+
+.animate-toast-out {
+  animation: toast-out 200ms ease-in both;
+}
+
+.animate-check-pop {
+  animation: check-pop 350ms var(--ease-out-quart) both;
+}
+
+/* Checkbox reward: pop + emerald ring pulse in one shot */
+.animate-check-reward {
+  animation:
+    check-pop 350ms var(--ease-out-quart) both,
+    ring-pulse 600ms ease-out both;
+}
+
+.animate-check-draw {
+  stroke-dasharray: 24;
+  animation: check-draw 300ms var(--ease-out-quart) 80ms both;
+}
+
+.animate-ring-pulse {
+  animation: ring-pulse 600ms ease-out both;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 1.8s ease-in-out infinite;
+}
+
+.animate-heat-fill {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: heat-fill 300ms var(--ease-out-quart) both;
+  animation-delay: var(--heat-delay, 0ms);
+}
+
+/* Row leaving a list: fade + collapse */
+@keyframes row-out {
+  from {
+    opacity: 1;
+    max-height: 5rem;
+  }
+  to {
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+.animate-row-out {
+  overflow: hidden;
+  animation: row-out var(--dur-base) ease-in both;
+}
+
+/* Chart bars grow up from the baseline */
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+.animate-bar-grow {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: bar-grow 500ms var(--ease-out-quart) both;
+  animation-delay: var(--heat-delay, 0ms);
+}
+
+.animate-line-draw {
+  stroke-dasharray: var(--line-length, 1000);
+  animation: line-draw 1.2s var(--ease-out-quart) 200ms both;
+}
+
+/* Skeleton shimmer block */
+.skeleton {
+  border-radius: 0.5rem;
+  background: linear-gradient(
+    100deg,
+    rgba(161, 161, 170, 0.14) 40%,
+    rgba(161, 161, 170, 0.3) 50%,
+    rgba(161, 161, 170, 0.14) 60%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+@media (prefers-color-scheme: dark) {
+  .skeleton {
+    background: linear-gradient(
+      100deg,
+      rgba(113, 113, 122, 0.16) 40%,
+      rgba(113, 113, 122, 0.32) 50%,
+      rgba(113, 113, 122, 0.16) 60%
+    );
+    background-size: 200% 100%;
+  }
+}
+
+/* Tactile press feedback for buttons / tappable rows. Includes color
+   transitions so it composes with hover color changes (this rule is
+   unlayered and would otherwise override Tailwind's transition-colors). */
+.pressable {
+  transition:
+    transform var(--dur-fast) var(--ease-out-quart),
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    opacity 150ms ease;
+}
+.pressable:active {
+  transform: scale(0.97);
+}
+
+/* Staggered child entrance. Index is automatic via nth-child; an inline
+   --stagger-i on a child overrides it. */
+.stagger-children > * {
+  animation: fade-in-up var(--dur-slow) var(--ease-out-quart) both;
+  animation-delay: calc(var(--stagger-i, 0) * 40ms);
+}
+.stagger-children > *:nth-child(2) {
+  --stagger-i: 1;
+}
+.stagger-children > *:nth-child(3) {
+  --stagger-i: 2;
+}
+.stagger-children > *:nth-child(4) {
+  --stagger-i: 3;
+}
+.stagger-children > *:nth-child(5) {
+  --stagger-i: 4;
+}
+.stagger-children > *:nth-child(6) {
+  --stagger-i: 5;
+}
+.stagger-children > *:nth-child(7) {
+  --stagger-i: 6;
+}
+.stagger-children > *:nth-child(8) {
+  --stagger-i: 7;
+}
+.stagger-children > *:nth-child(n + 9) {
+  --stagger-i: 8;
+}
+
+/* Card hover lift (desktop) */
+@media (hover: hover) {
+  .card-lift {
+    transition:
+      transform 200ms var(--ease-out-quart),
+      box-shadow 200ms var(--ease-out-quart),
+      border-color 200ms var(--ease-out-quart);
+  }
+  .card-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+}
+
+/* ---------- View transitions (route cross-fade) ---------- */
+
+::view-transition-old(root) {
+  animation: fade-in 150ms ease-in both reverse;
+}
+::view-transition-new(root) {
+  animation: fade-in 200ms ease-out both;
+}
+
+/* Page content cross-fade (class set by <PageTransition>) */
+::view-transition-old(.page-fade) {
+  animation: fade-in 150ms ease-in both reverse;
+}
+::view-transition-new(.page-fade) {
+  animation:
+    fade-in 200ms ease-out 100ms both,
+    slide-up-sm 250ms var(--ease-out-quart) both;
+}
+
+@keyframes slide-up-sm {
+  from {
+    transform: translateY(8px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }

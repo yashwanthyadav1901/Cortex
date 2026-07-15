@@ -24,10 +24,15 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (!ready) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-sm text-zinc-400">
-        Loading…
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3">
+        <span className="animate-pulse-glow text-3xl font-semibold tracking-tight text-indigo-600 dark:text-indigo-400">
+          Cortex
+        </span>
+        <span className="animate-fade-in text-xs text-zinc-400 [animation-delay:400ms]">
+          Loading your day…
+        </span>
       </div>
     );
   }
-  return <>{children}</>;
+  return <div className="animate-fade-in">{children}</div>;
 }
