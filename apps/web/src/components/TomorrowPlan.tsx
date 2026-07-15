@@ -2,16 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { get, patch, post } from "@/lib/api";
+import { localDateStr } from "@/lib/dates";
 import type { Todo } from "@/types";
-
-function tomorrowStr(): string {
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
 
 const PRIORITY_DOT: Record<string, string> = {
   high: "bg-rose-500",
@@ -22,15 +14,19 @@ const PRIORITY_DOT: Record<string, string> = {
 export default function TomorrowPlan() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [input, setInput] = useState("");
-  const tomorrow = tomorrowStr();
+  const tomorrow = localDateStr(1);
 
   const load = useCallback(async () => {
     const all = await get<Todo[]>("/todos?status=pending");
-    setTodos(all.filter((t) => t.due_date === tomorrow));
-  }, [tomorrow]);
+    setTodos(all.filter((t) => t.due_date === localDateStr(1)));
+  }, []);
 
+  // Refetch on focus so a dashboard left open across midnight rolls over.
   useEffect(() => {
     load().catch(() => {});
+    const onFocus = () => load().catch(() => {});
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
   }, [load]);
 
   async function addTodo(e: React.FormEvent) {

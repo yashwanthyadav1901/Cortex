@@ -7,7 +7,10 @@ import ChallengeCard from "@/components/ChallengeCard";
 import DeepThought from "@/components/DeepThought";
 
 import SavedList from "@/components/SavedList";
+import CountUp from "@/components/ui/CountUp";
+import PageSkeleton from "@/components/ui/PageSkeleton";
 import TodayFocus from "@/components/TodayFocus";
+import TodayTasks from "@/components/TodayTasks";
 import TomorrowPlan from "@/components/TomorrowPlan";
 
 import { allNodes, PILLAR_LABELS, pillarToSlug, ROADMAPS } from "@/content";
@@ -81,7 +84,7 @@ export default function Dashboard() {
     load();
   }, [load]);
 
-  if (loading) return <p className="text-sm text-zinc-400">Loading…</p>;
+  if (loading) return <PageSkeleton variant="dashboard" />;
 
   // Failed before anything loaded: show a retry screen instead of a
   // misleading empty dashboard. Later failures fall back to the toast.
@@ -119,7 +122,7 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="stagger-children space-y-6">
       <header className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Today</h1>
         {streak && (
@@ -130,7 +133,8 @@ export default function Dashboard() {
                 : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
             }`}
           >
-            🔥 {streak.current_streak} day{streak.current_streak === 1 ? "" : "s"}
+            🔥 <CountUp value={streak.current_streak} /> day
+            {streak.current_streak === 1 ? "" : "s"}
           </div>
         )}
       </header>
@@ -169,6 +173,8 @@ export default function Dashboard() {
         </section>
       )}
 
+      <TodayTasks />
+
       <TomorrowPlan />
 
       <section>
@@ -179,7 +185,7 @@ export default function Dashboard() {
           {upNext.map(({ pillar, node, done, total }) => (
             <div
               key={pillar}
-              className="flex items-center gap-3 rounded-xl border border-zinc-200 px-4 py-3 transition hover:border-indigo-400 dark:border-zinc-800"
+              className="card-lift flex items-center gap-3 rounded-xl border border-zinc-200 px-4 py-3 hover:border-indigo-400 dark:border-zinc-800"
             >
               <span className="text-xl">{PILLAR_ICONS[pillar]}</span>
               <Link
