@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { formatLocalDate } from "@/lib/dates";
 import type { HeatmapDay } from "@/types";
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -22,7 +23,9 @@ export default function ActivityTrend({ data, weeks }: Props) {
   const days: { date: Date; dateStr: string; count: number }[] = [];
   const cursor = new Date(start);
   while (cursor <= today) {
-    const dateStr = cursor.toISOString().slice(0, 10);
+    // Local date key — backend activity dates are keyed by the configured
+    // local timezone, and toISOString() (UTC) would shift days in IST.
+    const dateStr = formatLocalDate(cursor);
     days.push({ date: new Date(cursor), dateStr, count: countMap.get(dateStr) ?? 0 });
     cursor.setDate(cursor.getDate() + 1);
   }
@@ -98,7 +101,18 @@ export default function ActivityTrend({ data, weeks }: Props) {
               width={barWidth}
               height={d.count > 0 ? barHeight : 1}
               rx={2}
-              className={d.count > 0 ? "fill-indigo-500" : "fill-zinc-200 dark:fill-zinc-800"}
+              className={
+                d.count > 0
+                  ? "animate-bar-grow fill-indigo-500"
+                  : "fill-zinc-200 dark:fill-zinc-800"
+              }
+              style={
+                d.count > 0
+                  ? ({
+                      "--heat-delay": `${Math.min(i * 8, 400)}ms`,
+                    } as React.CSSProperties)
+                  : undefined
+              }
               onMouseEnter={(e) => {
                 const rect = (e.target as SVGRectElement).getBoundingClientRect();
                 setTooltip({

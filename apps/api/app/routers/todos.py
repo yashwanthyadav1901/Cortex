@@ -16,6 +16,7 @@ from app.schemas import (
     TodoReorder,
     TodoUpdate,
 )
+from app.utils import local_day, local_today
 
 router = APIRouter(
     prefix="/todos", tags=["todos"], dependencies=[Depends(require_user)]
@@ -102,8 +103,7 @@ def get_logs(db: Session = Depends(get_db)):
         ).all()
     )
 
-    now = datetime.now(timezone.utc)
-    today = now.date()
+    today = local_today()
     week_start = today - timedelta(days=today.weekday())
     month_start = today.replace(day=1)
 
@@ -119,7 +119,7 @@ def get_logs(db: Session = Depends(get_db)):
         hours = (done_at - t.created_at).total_seconds() / 3600
         total_hours.append(hours)
 
-        done_date = done_at.date()
+        done_date = local_day(done_at)
         if done_date >= week_start:
             this_week += 1
         if done_date >= month_start:
