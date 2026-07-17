@@ -1,4 +1,10 @@
-export type Pillar = "system_design" | "ai" | "dsa" | "ai_agents";
+export type Pillar =
+  | "system_design"
+  | "ai"
+  | "dsa"
+  | "ai_agents"
+  | "langgraph"
+  | "crewai";
 export type TopicStatus = "not_started" | "in_progress" | "done";
 export type Difficulty = "easy" | "medium" | "hard";
 export type ProjectStatus = "suggested" | "in_progress" | "done";

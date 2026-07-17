@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "presentation",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8321", "-d", "/Users/yashwanth/Desktop/presentation"],
+      "port": 8321
+    },
+    {
       "name": "cortex-api",
       "cwd": "apps/api",
       "runtimeExecutable": "/Users/yashwanth/.local/bin/uv",

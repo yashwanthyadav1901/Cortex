@@ -11,6 +11,8 @@ const PILLAR_ICONS: Record<Pillar, string> = {
   ai: "🤖",
   dsa: "🧩",
   ai_agents: "🕵️",
+  langgraph: "🕸️",
+  crewai: "⛵",
 };
 
 export default function RoadmapIndex() {

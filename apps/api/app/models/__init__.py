@@ -14,6 +14,8 @@ class Pillar(str, enum.Enum):
     ai = "ai"
     dsa = "dsa"
     ai_agents = "ai_agents"
+    langgraph = "langgraph"
+    crewai = "crewai"
 
 
 class TopicStatus(str, enum.Enum):

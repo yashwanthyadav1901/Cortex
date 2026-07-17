@@ -464,7 +464,7 @@ export const aiAgentsRoadmap: Roadmap = {
           slug: "agent-langgraph-crewai",
           title: "LangGraph & CrewAI",
           summary:
-            "LangGraph state machines and checkpointing, CrewAI role-based agents, AutoGen conversation patterns — when to use each framework.",
+            "LangGraph state machines and checkpointing, CrewAI role-based agents, AutoGen conversation patterns — when to use each framework. For full deep-dives, see the standalone LangGraph and CrewAI roadmaps.",
           why: "Frameworks trade flexibility for speed. Knowing what they abstract away lets you choose wisely and debug effectively.",
           estHours: 4,
           tasks: [

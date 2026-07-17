@@ -6,7 +6,9 @@ import { dsaProjects } from "./projects/dsa";
 import { systemDesignProjects } from "./projects/system-design";
 import { aiAgentsRoadmap } from "./roadmaps/ai-agents";
 import { aiRoadmap } from "./roadmaps/ai";
+import { crewaiRoadmap } from "./roadmaps/crewai";
 import { dsaRoadmap } from "./roadmaps/dsa";
+import { langgraphRoadmap } from "./roadmaps/langgraph";
 import { systemDesignRoadmap } from "./roadmaps/system-design";
 import type { ProjectSpec, Roadmap, RoadmapNode } from "./types";
 
@@ -15,6 +17,8 @@ export const ROADMAPS: Record<Pillar, Roadmap> = {
   ai: aiRoadmap,
   dsa: dsaRoadmap,
   ai_agents: aiAgentsRoadmap,
+  langgraph: langgraphRoadmap,
+  crewai: crewaiRoadmap,
 };
 
 export const PROJECTS: ProjectSpec[] = [
@@ -29,6 +33,8 @@ export const PILLAR_LABELS: Record<Pillar, string> = {
   ai: "AI",
   dsa: "DSA",
   ai_agents: "AI Agents",
+  langgraph: "LangGraph",
+  crewai: "CrewAI",
 };
 
 /** URL segment ↔ pillar mapping (pillar enum uses underscores). */
@@ -37,6 +43,8 @@ export const PILLAR_SLUGS: Record<string, Pillar> = {
   ai: "ai",
   dsa: "dsa",
   "ai-agents": "ai_agents",
+  langgraph: "langgraph",
+  crewai: "crewai",
 };
 
 export function pillarToSlug(pillar: Pillar): string {
