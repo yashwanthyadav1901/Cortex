@@ -7,6 +7,8 @@ import { Skeleton, SkeletonList } from "@/components/ui/Skeleton";
 import { del, get, patch, post, put } from "@/lib/api";
 import { invalidate, useApiQuery } from "@/lib/useApi";
 import { formatDueLabel, formatLocalDate, localDateStr } from "@/lib/dates";
+import { PRIORITY_CYCLE, PRIORITY_DOT, type TodoDraft } from "@/lib/todoUi";
+import TodoSheet from "@/components/todos/TodoSheet";
 import type { Todo, TodoLogs, TodoPriority, TodoStatus } from "@/types";
 
 type Tab = "todos" | "logs";
@@ -39,14 +41,6 @@ function monthLabel(key: string): string {
   const d = new Date(Number(y), Number(m) - 1);
   return d.toLocaleDateString(undefined, { month: "long", year: "numeric" });
 }
-
-const PRIORITY_DOT: Record<string, string> = {
-  high: "bg-rose-500",
-  medium: "bg-amber-400",
-  low: "bg-zinc-300 dark:bg-zinc-600",
-};
-
-const PRIORITY_CYCLE: TodoPriority[] = ["medium", "high", "low"];
 
 /* ────────────────────── TodosTab ────────────────────── */
 
@@ -82,6 +76,11 @@ function TodosTab() {
   const [editPriority, setEditPriority] = useState<TodoPriority>("medium");
   const [editDueDate, setEditDueDate] = useState("");
   const [editCategory, setEditCategory] = useState("");
+
+  // Mobile add/edit bottom sheet. Desktop keeps the inline forms instead.
+  const [sheet, setSheet] = useState<
+    { mode: "add" } | { mode: "edit"; todo: Todo } | null
+  >(null);
 
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
@@ -150,12 +149,28 @@ function TodosTab() {
     return { overdue, dueToday, upcoming, noDate };
   }, [pendingTodos]);
 
+  // Core create/update, shared by the inline (desktop) forms and the mobile sheet.
+  async function createTodo(draft: TodoDraft) {
+    await post<Todo>("/todos", draft);
+    await load();
+    // Keep the SWR-backed sibling views (dashboard tasks, command palette)
+    // in sync with this page's local list.
+    invalidate("/todos");
+  }
+
+  async function updateTodo(id: string, draft: TodoDraft) {
+    const updated = await patch<Todo>(`/todos/${id}`, draft);
+    setTodos((ts) => ts.map((t) => (t.id === id ? updated : t)));
+    invalidate("/todos");
+  }
+
   async function addTodo(e: React.FormEvent) {
     e.preventDefault();
     if (!newTitle.trim()) return;
     try {
-      await post<Todo>("/todos", {
+      await createTodo({
         title: newTitle.trim(),
+        description: null,
         priority: newPriority,
         due_date: newDueDate || null,
         category: newCategory.trim() || null,
@@ -165,10 +180,6 @@ function TodosTab() {
       setNewCategory("");
       setNewPriority("medium");
       setShowCustomDate(false);
-      await load();
-      // Keep the SWR-backed sibling views (dashboard tasks, command palette)
-      // in sync with this page's local list.
-      invalidate("/todos");
     } catch {}
   }
 
@@ -241,6 +252,11 @@ function TodosTab() {
   }
 
   function startEdit(todo: Todo) {
+    // Mobile edits happen in the bottom sheet; desktop uses the inline form.
+    if (!window.matchMedia("(min-width: 768px)").matches) {
+      setSheet({ mode: "edit", todo });
+      return;
+    }
     setEditingId(todo.id);
     setEditTitle(todo.title);
     setEditDescription(todo.description ?? "");
@@ -253,16 +269,22 @@ function TodosTab() {
     e.preventDefault();
     if (!editingId || !editTitle.trim()) return;
     try {
-      const updated = await patch<Todo>(`/todos/${editingId}`, {
+      await updateTodo(editingId, {
         title: editTitle.trim(),
         description: editDescription.trim() || null,
         priority: editPriority,
         due_date: editDueDate || null,
         category: editCategory.trim() || null,
       });
-      setTodos((ts) => ts.map((t) => (t.id === editingId ? updated : t)));
       setEditingId(null);
-      invalidate("/todos");
+    } catch {}
+  }
+
+  // Submit handler for the mobile add/edit sheet.
+  async function submitSheet(draft: TodoDraft) {
+    try {
+      if (sheet?.mode === "edit") await updateTodo(sheet.todo.id, draft);
+      else await createTodo(draft);
     } catch {}
   }
 
@@ -645,7 +667,7 @@ function TodosTab() {
           {noPendingVisible && (
             <p className="py-8 text-center text-sm text-zinc-400">
               {todos.length === 0
-                ? "No todos yet — add one below."
+                ? "No todos yet — add your first one."
                 : "Nothing matches your filters."}
             </p>
           )}
@@ -680,8 +702,9 @@ function TodosTab() {
         </ul>
       )}
 
-      {/* Quick add: single input; detail chips appear once there's text. */}
-      <form onSubmit={addTodo} className="space-y-2">
+      {/* Quick add (desktop): single input; detail chips appear once there's
+          text. On mobile the FAB + bottom sheet replace this. */}
+      <form onSubmit={addTodo} className="hidden space-y-2 md:block">
         <div className="flex gap-2">
           <input
             value={newTitle}
@@ -761,6 +784,28 @@ function TodosTab() {
           </div>
         )}
       </form>
+
+      {/* Mobile quick-add FAB — opens the add sheet (docked above bottom nav). */}
+      <button
+        type="button"
+        onClick={() => setSheet({ mode: "add" })}
+        aria-label="Add todo"
+        className="pressable fixed right-4 bottom-24 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg active:scale-95 md:hidden"
+      >
+        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 12h14" />
+        </svg>
+      </button>
+
+      {/* Mobile add/edit sheet (mounted only while open, seeds fresh each time). */}
+      {sheet && (
+        <TodoSheet
+          mode={sheet.mode}
+          initial={sheet.mode === "edit" ? sheet.todo : null}
+          onSubmit={submitSheet}
+          onClose={() => setSheet(null)}
+        />
+      )}
 
       {/* Undo-delete toast */}
       {pendingDelete && (
