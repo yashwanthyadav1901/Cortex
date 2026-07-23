@@ -2,36 +2,27 @@
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import StatusPill from "@/components/ui/StatusPill";
 import { findNodeGlobal, getProject, PILLAR_LABELS, pillarToSlug } from "@/content";
-import { del, get, post } from "@/lib/api";
+import { del, post } from "@/lib/api";
+import { invalidate, useApiQuery } from "@/lib/useApi";
 import type { Bookmark, Project } from "@/types";
 
 export default function ProjectDetailPage() {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
   const project = getProject(params.slug);
-  const [alreadyStarted, setAlreadyStarted] = useState(false);
   const [starting, setStarting] = useState(false);
-  const [bookmarked, setBookmarked] = useState(false);
-  const [bookmarkId, setBookmarkId] = useState<string | null>(null);
+  const { data: myProjects = [] } = useApiQuery<Project[]>("/projects");
+  const { data: bookmarks = [] } = useApiQuery<Bookmark[]>("/bookmarks");
 
-  useEffect(() => {
-    get<Project[]>("/projects")
-      .then((mine) => {
-        if (project && mine.some((m) => m.title === project.title)) {
-          setAlreadyStarted(true);
-        }
-      })
-      .catch(() => {});
-    get<Bookmark[]>("/bookmarks")
-      .then((bks) => {
-        const found = bks.find((b) => b.slug === params.slug);
-        if (found) { setBookmarked(true); setBookmarkId(found.id); }
-      })
-      .catch(() => {});
-  }, [project, params.slug]);
+  const alreadyStarted = project
+    ? myProjects.some((m) => m.title === project.title)
+    : false;
+  const myBookmark = bookmarks.find((b) => b.slug === params.slug);
+  const bookmarked = Boolean(myBookmark);
+  const bookmarkId = myBookmark?.id ?? null;
 
   if (!project) {
     return (
@@ -57,6 +48,7 @@ export default function ProjectDetailPage() {
         description: project.tagline,
         status: "in_progress",
       });
+      invalidate("/projects");
       router.push("/projects");
     } catch {
     } finally {
@@ -77,13 +69,10 @@ export default function ProjectDetailPage() {
               try {
                 if (bookmarked && bookmarkId) {
                   await del(`/bookmarks/${bookmarkId}`);
-                  setBookmarked(false);
-                  setBookmarkId(null);
                 } else {
-                  const bk = await post<Bookmark>("/bookmarks", { slug: params.slug, type: "project" });
-                  setBookmarked(true);
-                  setBookmarkId(bk.id);
+                  await post<Bookmark>("/bookmarks", { slug: params.slug, type: "project" });
                 }
+                invalidate("/bookmarks");
               } catch {}
             }}
             className={`text-lg transition ${bookmarked ? "text-indigo-500" : "text-zinc-300 hover:text-indigo-400"}`}

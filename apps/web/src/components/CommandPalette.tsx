@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { allNodes, BLOG_POSTS, PILLAR_LABELS, pillarToSlug, PROJECTS, ROADMAPS } from "@/content";
-import { get } from "@/lib/api";
+import { useApiQuery } from "@/lib/useApi";
 import type { DsaProblem, Microlearning, Pillar, Todo } from "@/types";
 
 interface SearchResult {
@@ -61,9 +61,15 @@ export default function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [todos, setTodos] = useState<Todo[] | null>(null);
-  const [learnings, setLearnings] = useState<Microlearning[] | null>(null);
-  const [dsaProblems, setDsaProblems] = useState<DsaProblem[] | null>(null);
+  // Fetch lazily (only once the palette opens) but through the shared cache,
+  // so these dedupe with the same endpoints used elsewhere.
+  const { data: todos } = useApiQuery<Todo[]>(open ? "/todos" : null);
+  const { data: learnings } = useApiQuery<Microlearning[]>(
+    open ? "/microlearnings" : null
+  );
+  const { data: dsaProblems } = useApiQuery<DsaProblem[]>(
+    open ? "/dsa-problems" : null
+  );
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -86,12 +92,8 @@ export default function CommandPalette() {
     requestAnimationFrame(() => inputRef.current?.focus());
     document.body.style.overflow = "hidden";
 
-    if (!todos) get<Todo[]>("/todos").then(setTodos).catch(() => {});
-    if (!learnings) get<Microlearning[]>("/microlearnings").then(setLearnings).catch(() => {});
-    if (!dsaProblems) get<DsaProblem[]>("/dsa-problems").then(setDsaProblems).catch(() => {});
-
     return () => { document.body.style.overflow = ""; };
-  }, [open, todos, learnings, dsaProblems]);
+  }, [open]);
 
   const close = useCallback(() => setOpen(false), []);
 

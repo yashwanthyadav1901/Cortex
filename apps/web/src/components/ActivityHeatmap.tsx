@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { get } from "@/lib/api";
+import { useState } from "react";
+import { useApiQuery } from "@/lib/useApi";
 import type { HeatmapDay } from "@/types";
 
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -22,14 +22,8 @@ function getColor(count: number, isFuture: boolean, dark: boolean): string {
 }
 
 export default function ActivityHeatmap() {
-  const [days, setDays] = useState<HeatmapDay[]>([]);
+  const { data: days = [] } = useApiQuery<HeatmapDay[]>("/activity/heatmap?months=12");
   const [tooltip, setTooltip] = useState<{ x: number; y: number; text: string } | null>(null);
-
-  useEffect(() => {
-    get<HeatmapDay[]>("/activity/heatmap?months=12")
-      .then(setDays)
-      .catch(() => {});
-  }, []);
 
   const today = new Date();
   const startOfYear = new Date(today.getFullYear(), 0, 1);

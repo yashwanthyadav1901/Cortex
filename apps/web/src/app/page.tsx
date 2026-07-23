@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import ActivityHeatmap from "@/components/ActivityHeatmap";
 import ChallengeCard from "@/components/ChallengeCard";
 import DeepThought from "@/components/DeepThought";
@@ -15,7 +15,7 @@ import TomorrowPlan from "@/components/TomorrowPlan";
 
 import { allNodes, PILLAR_LABELS, pillarToSlug, ROADMAPS } from "@/content";
 import type { RoadmapNode } from "@/content/types";
-import { get } from "@/lib/api";
+import { invalidate, useApiQuery } from "@/lib/useApi";
 import { useTodayList } from "@/lib/todayList";
 import type { Pillar, Streak, TopicProgress } from "@/types";
 
@@ -60,31 +60,32 @@ const PILLAR_ICONS: Record<Pillar, string> = {
 };
 
 export default function Dashboard() {
-  const [streak, setStreak] = useState<Streak | null>(null);
-  const [progress, setProgress] = useState<Record<string, TopicProgress>>({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const {
+    data: streak = null,
+    error: streakError,
+    isLoading: streakLoading,
+    mutate: mutateStreak,
+  } = useApiQuery<Streak>("/streak");
+  const {
+    data: progressData,
+    error: progressError,
+    isLoading: progressLoading,
+    mutate: mutateProgress,
+  } = useApiQuery<Record<string, TopicProgress>>("/progress");
   const today = useTodayList();
 
-  const load = useCallback(
-    () =>
-      Promise.all([
-        get<Streak>("/streak"),
-        get<Record<string, TopicProgress>>("/progress"),
-      ])
-        .then(([s, p]) => {
-          setStreak(s);
-          setProgress(p);
-          setError(false);
-        })
-        .catch(() => setError(true))
-        .finally(() => setLoading(false)),
-    []
-  );
+  const progress = progressData ?? {};
+  const loading = streakLoading || progressLoading;
+  const error = streakError || progressError;
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  // A topic status change (via TodayFocus/FocusPanel) logs activity, so refresh
+  // the streak, progress, and the activity-derived views (heatmap, analytics).
+  const refresh = useCallback(() => {
+    mutateStreak();
+    mutateProgress();
+    invalidate("/activity");
+    invalidate("/analytics");
+  }, [mutateStreak, mutateProgress]);
 
   if (loading) return <PageSkeleton variant="dashboard" />;
 
@@ -96,8 +97,8 @@ export default function Dashboard() {
         <p className="text-sm text-zinc-500">Couldn&apos;t reach the server.</p>
         <button
           onClick={() => {
-            setLoading(true);
-            load();
+            mutateStreak();
+            mutateProgress();
           }}
           className="mt-4 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
         >
@@ -145,7 +146,7 @@ export default function Dashboard() {
 
       <ChallengeCard />
 
-      <TodayFocus today={today} progress={progress} onStatusChange={load} />
+      <TodayFocus today={today} progress={progress} onStatusChange={refresh} />
 
       {carryOver.length > 0 && (
         <section>

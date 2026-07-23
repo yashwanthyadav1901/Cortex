@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { allNodes, getProject, PILLAR_LABELS, pillarToSlug, PROJECTS, ROADMAPS } from "@/content";
-import { del, get } from "@/lib/api";
+import { del } from "@/lib/api";
+import { useApiQuery } from "@/lib/useApi";
 import type { Bookmark, Pillar } from "@/types";
 
 function resolveBookmark(b: Bookmark): { title: string; href: string; subtitle: string } | null {
@@ -33,13 +33,7 @@ function resolveBookmark(b: Bookmark): { title: string; href: string; subtitle: 
 }
 
 export default function SavedList() {
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
-
-  useEffect(() => {
-    get<Bookmark[]>("/bookmarks")
-      .then(setBookmarks)
-      .catch(() => {});
-  }, []);
+  const { data: bookmarks = [], mutate } = useApiQuery<Bookmark[]>("/bookmarks");
 
   if (bookmarks.length === 0) return null;
 
@@ -67,8 +61,17 @@ export default function SavedList() {
               <button
                 onClick={async () => {
                   try {
-                    await del(`/bookmarks/${b.id}`);
-                    setBookmarks((prev) => prev.filter((x) => x.id !== b.id));
+                    await mutate(
+                      async () => {
+                        await del(`/bookmarks/${b.id}`);
+                        return bookmarks.filter((x) => x.id !== b.id);
+                      },
+                      {
+                        optimisticData: bookmarks.filter((x) => x.id !== b.id),
+                        rollbackOnError: true,
+                        revalidate: false,
+                      }
+                    );
                   } catch {}
                 }}
                 className="px-1 text-zinc-300 hover:text-rose-500"

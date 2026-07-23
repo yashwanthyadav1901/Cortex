@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { get, patch, post } from "@/lib/api";
+import { useState } from "react";
+import { patch, post } from "@/lib/api";
 import { localDateStr } from "@/lib/dates";
+import { invalidate, useApiQuery } from "@/lib/useApi";
 import type { Todo } from "@/types";
 
 const PRIORITY_DOT: Record<string, string> = {
@@ -12,22 +13,13 @@ const PRIORITY_DOT: Record<string, string> = {
 };
 
 export default function TomorrowPlan() {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const { data: all = [], mutate } = useApiQuery<Todo[]>(
+    "/todos?status=pending"
+  );
   const [input, setInput] = useState("");
   const tomorrow = localDateStr(1);
 
-  const load = useCallback(async () => {
-    const all = await get<Todo[]>("/todos?status=pending");
-    setTodos(all.filter((t) => t.due_date === localDateStr(1)));
-  }, []);
-
-  // Refetch on focus so a dashboard left open across midnight rolls over.
-  useEffect(() => {
-    load().catch(() => {});
-    const onFocus = () => load().catch(() => {});
-    window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
-  }, [load]);
+  const todos = all.filter((t) => t.due_date === tomorrow);
 
   async function addTodo(e: React.FormEvent) {
     e.preventDefault();
@@ -35,12 +27,22 @@ export default function TomorrowPlan() {
     if (!title) return;
     await post("/todos", { title, due_date: tomorrow });
     setInput("");
-    await load();
+    invalidate("/todos");
   }
 
   async function toggleDone(todo: Todo) {
-    await patch(`/todos/${todo.id}`, { status: "done" });
-    setTodos((prev) => prev.filter((t) => t.id !== todo.id));
+    await mutate(
+      async () => {
+        await patch(`/todos/${todo.id}`, { status: "done" });
+        return all.filter((t) => t.id !== todo.id);
+      },
+      {
+        optimisticData: all.filter((t) => t.id !== todo.id),
+        rollbackOnError: true,
+        revalidate: false,
+      }
+    );
+    invalidate("/todos");
   }
 
   return (

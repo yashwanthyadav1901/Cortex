@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { get, patch, post } from "@/lib/api";
+import { useState } from "react";
+import { patch, post } from "@/lib/api";
 import { formatDueLabel, localDateStr } from "@/lib/dates";
+import { invalidate, useApiQuery } from "@/lib/useApi";
 import type { Todo } from "@/types";
 
 const PRIORITY_DOT: Record<string, string> = {
@@ -12,24 +13,14 @@ const PRIORITY_DOT: Record<string, string> = {
 };
 
 export default function TodayTasks() {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const { data: all = [], mutate } = useApiQuery<Todo[]>(
+    "/todos?status=pending"
+  );
   const [input, setInput] = useState("");
   const [justDoneId, setJustDoneId] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    const all = await get<Todo[]>("/todos?status=pending");
-    setTodos(all.filter((t) => t.due_date && t.due_date <= localDateStr(0)));
-  }, []);
-
-  // Refetch on focus so a dashboard left open across midnight rolls over.
-  useEffect(() => {
-    load().catch(() => {});
-    const onFocus = () => load().catch(() => {});
-    window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
-  }, [load]);
-
   const today = localDateStr(0);
+  const todos = all.filter((t) => t.due_date && t.due_date <= today);
   const overdue = todos.filter((t) => t.due_date && t.due_date < today);
   const dueToday = todos.filter((t) => t.due_date === today);
 
@@ -39,16 +30,20 @@ export default function TodayTasks() {
     if (!title) return;
     await post("/todos", { title, due_date: today });
     setInput("");
-    await load();
+    invalidate("/todos");
   }
 
   async function completeTodo(todo: Todo) {
     await patch(`/todos/${todo.id}`, { status: "done" });
     setJustDoneId(todo.id);
-    // Let the checkmark animation play before the row leaves.
+    // Let the checkmark animation play before the row leaves, then drop it
+    // from the shared cache and refresh sibling todo views.
     setTimeout(() => {
-      setTodos((prev) => prev.filter((t) => t.id !== todo.id));
       setJustDoneId(null);
+      mutate((cur = []) => cur.filter((t) => t.id !== todo.id), {
+        revalidate: false,
+      });
+      invalidate("/todos");
     }, 550);
   }
 

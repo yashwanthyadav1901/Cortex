@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import QuizComponent from "@/components/Quiz";
 import StatusPill from "@/components/ui/StatusPill";
 import TopicChat from "@/components/TopicChat";
 import { findNode, PILLAR_SLUGS, projectsForNode } from "@/content";
 import type { ResourceType } from "@/content/types";
-import { del, get, post, put } from "@/lib/api";
+import { del, post, put } from "@/lib/api";
+import { invalidate, useApiQuery } from "@/lib/useApi";
 import type { Bookmark, DsaProblem, Quiz, TopicProgress, TopicStatus, UserResource } from "@/types";
 
 const RESOURCE_ICONS: Record<ResourceType, string> = {
@@ -59,24 +60,38 @@ export default function TopicDetailPage() {
   const [notesSaved, setNotesSaved] = useState(false);
   const [notesError, setNotesError] = useState(false);
 
-  const [dsaProblems, setDsaProblems] = useState<DsaProblem[]>([]);
-  const [bookmarked, setBookmarked] = useState(false);
-  const [bookmarkId, setBookmarkId] = useState<string | null>(null);
-  const [userResources, setUserResources] = useState<UserResource[]>([]);
   const [newResTitle, setNewResTitle] = useState("");
   const [newResUrl, setNewResUrl] = useState("");
   const [newResNote, setNewResNote] = useState("");
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [quizLoading, setQuizLoading] = useState(false);
-  const [lastScore, setLastScore] = useState<{ score: number; total: number } | null>(null);
+  // Score of the quiz just completed this session; falls back to the newest
+  // completed quiz from the server.
+  const [localScore, setLocalScore] = useState<{ score: number; total: number } | null>(null);
 
-  const loadResources = useCallback(async () => {
-    try {
-      setUserResources(
-        await get<UserResource[]>(`/resources?topic_slug=${params.slug}`)
-      );
-    } catch {}
-  }, [params.slug]);
+  const resourcesKey = `/resources?topic_slug=${params.slug}`;
+  const { data: progress } =
+    useApiQuery<Record<string, TopicProgress>>("/progress");
+  const { data: bookmarks = [] } = useApiQuery<Bookmark[]>("/bookmarks");
+  const { data: userResources = [], mutate: mutateResources } =
+    useApiQuery<UserResource[]>(resourcesKey);
+  const { data: dsaProblems = [] } = useApiQuery<DsaProblem[]>(
+    params.pillar === "dsa" ? `/dsa-problems?topic_tag=${params.slug}` : null
+  );
+  const { data: quizzes } = useApiQuery<Quiz[]>(
+    `/quizzes?topic_slug=${params.slug}`
+  );
+
+  const myBookmark = bookmarks.find((b) => b.slug === params.slug);
+  const bookmarked = Boolean(myBookmark);
+  const bookmarkId = myBookmark?.id ?? null;
+
+  const completedQuiz = quizzes?.find((q) => q.score !== null);
+  const lastScore =
+    localScore ??
+    (completedQuiz
+      ? { score: completedQuiz.score!, total: completedQuiz.total }
+      : null);
 
   const tasks = found?.node.tasks ?? [];
   const { checks, toggle, done: tasksDone } = useTaskChecks(
@@ -84,35 +99,19 @@ export default function TopicDetailPage() {
     tasks.length
   );
 
+  // Seed the editable status/notes fields from the cached progress once the
+  // entry for this topic arrives; the ref guards against revalidation or a
+  // slug revisit clobbering unsaved edits.
+  const seededSlug = useRef<string | null>(null);
+  const progressEntry = progress?.[params.slug];
   useEffect(() => {
-    get<Record<string, TopicProgress>>("/progress")
-      .then((p) => {
-        const entry = p[params.slug];
-        if (entry) {
-          setStatus(entry.status);
-          setNotes(entry.notes ?? "");
-        }
-      })
-      .catch(() => {});
-    if (params.pillar === "dsa") {
-      get<DsaProblem[]>(`/dsa-problems?topic_tag=${params.slug}`)
-        .then(setDsaProblems)
-        .catch(() => {});
+    if (progressEntry && seededSlug.current !== params.slug) {
+      setStatus(progressEntry.status);
+      setNotes(progressEntry.notes ?? "");
+      seededSlug.current = params.slug;
     }
-    loadResources();
-    get<Bookmark[]>("/bookmarks")
-      .then((bks) => {
-        const found = bks.find((b) => b.slug === params.slug);
-        if (found) { setBookmarked(true); setBookmarkId(found.id); }
-      })
-      .catch(() => {});
-    get<Quiz[]>(`/quizzes?topic_slug=${params.slug}`)
-      .then((quizzes) => {
-        const completed = quizzes.find((q) => q.score !== null);
-        if (completed) setLastScore({ score: completed.score!, total: completed.total });
-      })
-      .catch(() => {});
-  }, [params.slug, params.pillar, loadResources]);
+  }, [progressEntry, params.slug]);
+
 
   if (!pillar || !found) {
     return (
@@ -140,6 +139,12 @@ export default function TopicDetailPage() {
         status: next,
         notes: notes || null,
       });
+      // A status change logs activity → refresh progress and the
+      // activity-derived views (dashboard streak, heatmap, analytics).
+      invalidate("/progress");
+      invalidate("/streak");
+      invalidate("/activity");
+      invalidate("/analytics");
     } catch {
       setStatus(prev);
     } finally {
@@ -156,6 +161,7 @@ export default function TopicDetailPage() {
         status,
         notes: notes || null,
       });
+      invalidate("/progress");
       setNotesError(false);
       setNotesSaved(true);
       setTimeout(() => setNotesSaved(false), 1500);
@@ -177,13 +183,10 @@ export default function TopicDetailPage() {
               try {
                 if (bookmarked && bookmarkId) {
                   await del(`/bookmarks/${bookmarkId}`);
-                  setBookmarked(false);
-                  setBookmarkId(null);
                 } else {
-                  const bk = await post<Bookmark>("/bookmarks", { slug: params.slug, type: "topic" });
-                  setBookmarked(true);
-                  setBookmarkId(bk.id);
+                  await post<Bookmark>("/bookmarks", { slug: params.slug, type: "topic" });
                 }
+                invalidate("/bookmarks");
               } catch {}
             }}
             className={`text-lg transition ${bookmarked ? "text-indigo-500" : "text-zinc-300 hover:text-indigo-400"}`}
@@ -229,6 +232,7 @@ export default function TopicDetailPage() {
                 tasks: node.tasks ?? [],
               });
               setQuiz(result);
+              invalidate("/quizzes");
             } catch {}
             setQuizLoading(false);
           }}
@@ -265,8 +269,9 @@ export default function TopicDetailPage() {
           <QuizComponent
             quiz={quiz}
             onComplete={(updated) => {
-              setLastScore({ score: updated.score!, total: updated.total });
+              setLocalScore({ score: updated.score!, total: updated.total });
               setQuiz(null);
+              invalidate("/quizzes");
             }}
           />
         </section>
@@ -403,8 +408,19 @@ export default function TopicDetailPage() {
                   <button
                     onClick={async () => {
                       try {
-                        await del(`/resources/${r.id}`);
-                        setUserResources((rs) => rs.filter((x) => x.id !== r.id));
+                        await mutateResources(
+                          async () => {
+                            await del(`/resources/${r.id}`);
+                            return userResources.filter((x) => x.id !== r.id);
+                          },
+                          {
+                            optimisticData: userResources.filter(
+                              (x) => x.id !== r.id
+                            ),
+                            rollbackOnError: true,
+                            revalidate: false,
+                          }
+                        );
                       } catch {}
                     }}
                     className="px-1 text-zinc-300 hover:text-rose-500"
@@ -431,7 +447,7 @@ export default function TopicDetailPage() {
               setNewResTitle("");
               setNewResUrl("");
               setNewResNote("");
-              await loadResources();
+              mutateResources();
             } catch {}
           }}
           className="flex flex-wrap gap-2"

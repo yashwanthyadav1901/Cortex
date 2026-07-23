@@ -5,6 +5,7 @@ import StatusPill from "@/components/ui/StatusPill";
 import CountUp from "@/components/ui/CountUp";
 import { Skeleton, SkeletonList } from "@/components/ui/Skeleton";
 import { del, get, patch, post, put } from "@/lib/api";
+import { invalidate, useApiQuery } from "@/lib/useApi";
 import { formatDueLabel, formatLocalDate, localDateStr } from "@/lib/dates";
 import type { Todo, TodoLogs, TodoPriority, TodoStatus } from "@/types";
 
@@ -165,6 +166,9 @@ function TodosTab() {
       setNewPriority("medium");
       setShowCustomDate(false);
       await load();
+      // Keep the SWR-backed sibling views (dashboard tasks, command palette)
+      // in sync with this page's local list.
+      invalidate("/todos");
     } catch {}
   }
 
@@ -172,6 +176,7 @@ function TodosTab() {
     const status: TodoStatus = todo.status === "done" ? "pending" : "done";
     try {
       const updated = await patch<Todo>(`/todos/${todo.id}`, { status });
+      invalidate("/todos");
       if (status === "done") {
         // Let the checkmark play, then fade the row out of the pending list.
         setJustToggledId(todo.id);
@@ -197,7 +202,9 @@ function TodosTab() {
     if (deleteTimer.current) clearTimeout(deleteTimer.current);
     const pd = pendingDeleteRef.current;
     if (pd) {
-      del(`/todos/${pd.todo.id}`).catch(() => load().catch(() => {}));
+      del(`/todos/${pd.todo.id}`)
+        .then(() => invalidate("/todos"))
+        .catch(() => load().catch(() => {}));
     }
     pendingDeleteRef.current = null;
     setPendingDelete(null);
@@ -255,6 +262,7 @@ function TodosTab() {
       });
       setTodos((ts) => ts.map((t) => (t.id === editingId ? updated : t)));
       setEditingId(null);
+      invalidate("/todos");
     } catch {}
   }
 
@@ -269,6 +277,7 @@ function TodosTab() {
     setTodos(newTodos);
     try {
       await put<Todo[]>("/todos/reorder", { ids: orderedIds });
+      invalidate("/todos");
     } catch {
       await load();
     }
@@ -732,19 +741,12 @@ function LogsSkeleton() {
 }
 
 function LogsTab() {
-  const [data, setData] = useState<TodoLogs | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useApiQuery<TodoLogs>("/todos/logs");
   const [category, setCategory] = useState("");
   const [expandedMonths, setExpandedMonths] = useState<Set<string> | null>(null);
 
-  useEffect(() => {
-    get<TodoLogs>("/todos/logs")
-      .then(setData)
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return <LogsSkeleton />;
+  if (isLoading && !data)
+    return <LogsSkeleton />;
   if (!data) return <p className="py-8 text-center text-sm text-zinc-400">Could not load logs.</p>;
 
   const { todos, summary } = data;
@@ -936,17 +938,10 @@ function LogsTab() {
 
 export default function TodosPage() {
   const [tab, setTab] = useState<Tab>("todos");
-  const [overdueCount, setOverdueCount] = useState(0);
-
-  useEffect(() => {
-    get<Todo[]>("/todos?status=pending")
-      .then((ts) =>
-        setOverdueCount(
-          ts.filter((t) => t.due_date && t.due_date < localDateStr()).length
-        )
-      )
-      .catch(() => {});
-  }, []);
+  const { data: pending = [] } = useApiQuery<Todo[]>("/todos?status=pending");
+  const overdueCount = pending.filter(
+    (t) => t.due_date && t.due_date < localDateStr()
+  ).length;
 
   return (
     <div className="space-y-4">

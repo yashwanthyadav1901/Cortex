@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import ActivityTrend from "@/components/analytics/ActivityTrend";
 import CountUp from "@/components/ui/CountUp";
 import PageSkeleton from "@/components/ui/PageSkeleton";
 import { allNodes, PILLAR_LABELS, ROADMAPS } from "@/content";
-import { get } from "@/lib/api";
+import { useApiQuery } from "@/lib/useApi";
 import type { AnalyticsSummary, Pillar, Streak } from "@/types";
 
 const TYPE_CONFIG: Record<string, { label: string; color: string; darkColor: string }> = {
@@ -22,24 +21,12 @@ const PILLAR_COLORS: Record<string, string> = {
 };
 
 export default function AnalyticsPage() {
-  const [data, setData] = useState<AnalyticsSummary | null>(null);
-  const [streak, setStreak] = useState<Streak | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useApiQuery<AnalyticsSummary>(
+    "/analytics/summary?weeks=8"
+  );
+  const { data: streak = null } = useApiQuery<Streak>("/streak");
 
-  useEffect(() => {
-    Promise.all([
-      get<AnalyticsSummary>("/analytics/summary?weeks=8"),
-      get<Streak>("/streak"),
-    ])
-      .then(([d, s]) => {
-        setData(d);
-        setStreak(s);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return <PageSkeleton variant="stats" />;
+  if (isLoading && !data) return <PageSkeleton variant="stats" />;
   if (!data) return <p className="text-sm text-zinc-400">Couldn&apos;t load analytics.</p>;
 
   const totalTopics = (Object.keys(ROADMAPS) as Pillar[]).reduce(

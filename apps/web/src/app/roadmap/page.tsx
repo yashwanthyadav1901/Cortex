@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { allNodes, PILLAR_LABELS, pillarToSlug, ROADMAPS } from "@/content";
-import { get } from "@/lib/api";
+import { useApiQuery } from "@/lib/useApi";
 import type { Pillar, TopicProgress } from "@/types";
 
 const PILLAR_ICONS: Record<Pillar, string> = {
@@ -16,13 +15,8 @@ const PILLAR_ICONS: Record<Pillar, string> = {
 };
 
 export default function RoadmapIndex() {
-  const [progress, setProgress] = useState<Record<string, TopicProgress>>({});
-
-  useEffect(() => {
-    get<Record<string, TopicProgress>>("/progress")
-      .then(setProgress)
-      .catch(() => {});
-  }, []);
+  const { data: progress = {} } =
+    useApiQuery<Record<string, TopicProgress>>("/progress");
 
   return (
     <div className="space-y-4">

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { pillarToSlug } from "@/content";
 import type { Roadmap, RoadmapNode } from "@/content/types";
-import { get } from "@/lib/api";
+import { useApiQuery } from "@/lib/useApi";
 import type { DsaProblem, TopicProgress, TopicStatus } from "@/types";
 
 export type ProgressMap = Record<string, TopicProgress>;
@@ -81,24 +81,19 @@ function useTaskCounts(nodes: RoadmapNode[]) {
 }
 
 function useDsaSolvedCounts(isDsa: boolean) {
-  const [counts, setCounts] = useState<Record<string, { solved: number; total: number }>>({});
+  const { data: problems } = useApiQuery<DsaProblem[]>(
+    isDsa ? "/dsa-problems" : null
+  );
 
-  useEffect(() => {
-    if (!isDsa) return;
-    get<DsaProblem[]>("/dsa-problems")
-      .then((problems) => {
-        const map: Record<string, { solved: number; total: number }> = {};
-        for (const p of problems) {
-          if (!map[p.topic_tag]) map[p.topic_tag] = { solved: 0, total: 0 };
-          map[p.topic_tag].total++;
-          if (p.status === "solved") map[p.topic_tag].solved++;
-        }
-        setCounts(map);
-      })
-      .catch(() => {});
-  }, [isDsa]);
-
-  return counts;
+  return useMemo(() => {
+    const map: Record<string, { solved: number; total: number }> = {};
+    for (const p of problems ?? []) {
+      if (!map[p.topic_tag]) map[p.topic_tag] = { solved: 0, total: 0 };
+      map[p.topic_tag].total++;
+      if (p.status === "solved") map[p.topic_tag].solved++;
+    }
+    return map;
+  }, [problems]);
 }
 
 function NodeCard({

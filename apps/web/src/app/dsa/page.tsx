@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import StatusPill from "@/components/ui/StatusPill";
 import { allNodes, ROADMAPS } from "@/content";
-import { del, get, patch, post } from "@/lib/api";
+import { del, patch, post } from "@/lib/api";
+import { invalidate, useApiQuery } from "@/lib/useApi";
 import type { Difficulty, DsaProblem, ProblemStatus } from "@/types";
 
 const DSA_TOPICS = allNodes(ROADMAPS.dsa).map((n) => ({
@@ -12,7 +13,9 @@ const DSA_TOPICS = allNodes(ROADMAPS.dsa).map((n) => ({
 }));
 
 export default function DsaPage() {
-  const [problems, setProblems] = useState<DsaProblem[]>([]);
+  const { data: problems = [], mutate } = useApiQuery<DsaProblem[]>(
+    "/dsa-problems"
+  );
   const [filterTag, setFilterTag] = useState("");
   const [filterDifficulty, setFilterDifficulty] = useState<Difficulty | "">("");
   const [filterStatus, setFilterStatus] = useState<ProblemStatus | "">("");
@@ -22,16 +25,8 @@ export default function DsaPage() {
   const [customTag, setCustomTag] = useState("");
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
 
-  // Fetch everything once; filter client-side so the filter dropdowns
-  // always offer the full set of options.
-  const load = useCallback(async () => {
-    setProblems(await get<DsaProblem[]>("/dsa-problems"));
-  }, []);
-
-  useEffect(() => {
-    load().catch(() => {});
-  }, [load]);
-
+  // Fetch everything once (shared cache); filter client-side so the filter
+  // dropdowns always offer the full set of options.
   const visible = useMemo(
     () =>
       problems.filter(
@@ -60,22 +55,52 @@ export default function DsaPage() {
       setTitle("");
       setUrl("");
       setCustomTag("");
-      await load();
+      invalidate("/dsa-problems");
     } catch {}
   }
 
   async function toggleSolved(problem: DsaProblem) {
     const status: ProblemStatus = problem.status === "solved" ? "todo" : "solved";
     try {
-      const updated = await patch<DsaProblem>(`/dsa-problems/${problem.id}`, { status });
-      setProblems((ps) => ps.map((p) => (p.id === problem.id ? updated : p)));
+      await mutate(
+        async () => {
+          const updated = await patch<DsaProblem>(
+            `/dsa-problems/${problem.id}`,
+            { status }
+          );
+          return problems.map((p) => (p.id === problem.id ? updated : p));
+        },
+        {
+          optimisticData: problems.map((p) =>
+            p.id === problem.id ? { ...p, status } : p
+          ),
+          rollbackOnError: true,
+          revalidate: false,
+        }
+      );
+      // Solving/unsolving logs a dsa activity → refresh the streak and the
+      // activity-derived views, plus any topic-filtered problem lists.
+      invalidate("/dsa-problems");
+      invalidate("/streak");
+      invalidate("/activity");
+      invalidate("/analytics");
     } catch {}
   }
 
   async function remove(id: string) {
     try {
-      await del(`/dsa-problems/${id}`);
-      setProblems((ps) => ps.filter((p) => p.id !== id));
+      await mutate(
+        async () => {
+          await del(`/dsa-problems/${id}`);
+          return problems.filter((p) => p.id !== id);
+        },
+        {
+          optimisticData: problems.filter((p) => p.id !== id),
+          rollbackOnError: true,
+          revalidate: false,
+        }
+      );
+      invalidate("/dsa-problems");
     } catch {}
   }
 

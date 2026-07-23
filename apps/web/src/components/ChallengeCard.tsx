@@ -1,23 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { CHALLENGE_TASKS, getLevel } from "@/content/challenge";
-import { get } from "@/lib/api";
+import { useApiQuery } from "@/lib/useApi";
 import type { ChallengeDay } from "@/types";
 
 export default function ChallengeCard() {
-  const [started, setStarted] = useState<boolean | null>(null);
-  const [today, setToday] = useState<ChallengeDay | null>(null);
-
-  useEffect(() => {
-    get<{ started: boolean }>("/challenge/started")
-      .then(({ started: s }) => {
-        setStarted(s);
-        if (s) get<ChallengeDay>("/challenge/today").then(setToday);
-      })
-      .catch(() => {});
-  }, []);
+  const { data: startedResp } = useApiQuery<{ started: boolean }>(
+    "/challenge/started"
+  );
+  const started = startedResp ? startedResp.started : null;
+  const { data: today = null } = useApiQuery<ChallengeDay>(
+    started ? "/challenge/today" : null
+  );
 
   if (started === null) return null;
 

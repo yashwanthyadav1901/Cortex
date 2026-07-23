@@ -7,6 +7,7 @@ import AuthGuard from "@/components/AuthGuard";
 import PageTransition from "@/components/PageTransition";
 import BottomNav from "@/components/nav/BottomNav";
 import Sidebar from "@/components/nav/Sidebar";
+import Providers from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,17 +32,19 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} antialiased`}>
       <body className="min-h-screen bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-        <AuthGuard>
-          <div className="flex">
-            <Sidebar />
-            <main className="mx-auto w-full max-w-2xl flex-1 px-4 pt-6 pb-24 md:px-8 md:pb-10">
-              <PageTransition>{children}</PageTransition>
-            </main>
-          </div>
-          <BottomNav />
-          <ApiErrorToast />
-          <CommandPalette />
-        </AuthGuard>
+        <Providers>
+          <AuthGuard>
+            <div className="flex">
+              <Sidebar />
+              <main className="mx-auto w-full max-w-2xl flex-1 px-4 pt-6 pb-24 md:px-8 md:pb-10">
+                <PageTransition>{children}</PageTransition>
+              </main>
+            </div>
+            <BottomNav />
+            <ApiErrorToast />
+            <CommandPalette />
+          </AuthGuard>
+        </Providers>
       </body>
     </html>
   );

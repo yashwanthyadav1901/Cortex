@@ -2,36 +2,27 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import RoadmapFlow from "@/components/roadmap/RoadmapFlow";
 import { SkeletonList } from "@/components/ui/Skeleton";
 import { allNodes, PILLAR_SLUGS, ROADMAPS } from "@/content";
-import { get } from "@/lib/api";
+import { useApiQuery } from "@/lib/useApi";
 import type { DsaProblem, TopicProgress } from "@/types";
 
 export default function RoadmapPillarPage() {
   const params = useParams<{ pillar: string }>();
   const pillar = PILLAR_SLUGS[params.pillar];
-  const [progress, setProgress] = useState<Record<string, TopicProgress>>({});
-  const [dsaSolvedCount, setDsaSolvedCount] = useState<{ solved: number; total: number } | null>(null);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    get<Record<string, TopicProgress>>("/progress")
-      .then(setProgress)
-      .catch(() => {})
-      .finally(() => setLoaded(true));
-    if (params.pillar === "dsa") {
-      get<DsaProblem[]>("/dsa-problems")
-        .then((problems) => {
-          setDsaSolvedCount({
-            solved: problems.filter((p) => p.status === "solved").length,
-            total: problems.length,
-          });
-        })
-        .catch(() => {});
-    }
-  }, [params.pillar]);
+  const { data: progress = {}, isLoading } =
+    useApiQuery<Record<string, TopicProgress>>("/progress");
+  const { data: dsaProblems } = useApiQuery<DsaProblem[]>(
+    params.pillar === "dsa" ? "/dsa-problems" : null
+  );
+  const loaded = !isLoading;
+  const dsaSolvedCount = dsaProblems
+    ? {
+        solved: dsaProblems.filter((p) => p.status === "solved").length,
+        total: dsaProblems.length,
+      }
+    : null;
 
   if (!pillar) {
     return (
