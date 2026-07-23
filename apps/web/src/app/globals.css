@@ -290,6 +290,15 @@ body {
   transform: scale(0.97);
 }
 
+/* Hide the scrollbar on horizontal chip/filter strips (mobile toolbars). */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Staggered child entrance. Index is automatic via nth-child; an inline
    --stagger-i on a child overrides it. */
 .stagger-children > * {
