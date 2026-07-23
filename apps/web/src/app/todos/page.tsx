@@ -448,7 +448,14 @@ function TodosTab() {
             {todo.description && <span className="truncate">— {todo.description}</span>}
           </div>
         </div>
-        <StatusPill value={todo.priority} />
+        {/* Mobile: compact dot to reclaim title width. Desktop: full word pill. */}
+        <span
+          className={`h-2 w-2 shrink-0 rounded-full md:hidden ${PRIORITY_DOT[todo.priority]}`}
+          aria-hidden="true"
+        />
+        <span className="hidden md:inline-block">
+          <StatusPill value={todo.priority} />
+        </span>
         {draggable && (
           <>
             <span className="hidden text-zinc-300 sm:block dark:text-zinc-700">⠿</span>
@@ -938,6 +945,31 @@ function LogsTab() {
                       todo.due_date && formatLocalDate(new Date(doneAt)) > todo.due_date;
                     const tookLong = hours > 7 * 24;
 
+                    // Duration + status badges. On mobile these wrap under the
+                    // title (see meta row); on desktop they sit on the right.
+                    const trailing = (
+                      <>
+                        <span className="text-xs font-medium text-zinc-400">
+                          {formatDuration(hours)}
+                        </span>
+                        {wasOverdue && (
+                          <span className="rounded bg-rose-100 px-1.5 py-0.5 text-xs font-medium text-rose-600 dark:bg-rose-950 dark:text-rose-400">
+                            late
+                          </span>
+                        )}
+                        {!wasOverdue && todo.due_date && (
+                          <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-xs font-medium text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400">
+                            on time
+                          </span>
+                        )}
+                        {tookLong && !wasOverdue && (
+                          <span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:bg-amber-950 dark:text-amber-400">
+                            slow
+                          </span>
+                        )}
+                      </>
+                    );
+
                     return (
                       <li
                         key={todo.id}
@@ -962,26 +994,16 @@ function LogsTab() {
                                 {todo.category}
                               </span>
                             )}
+                            {/* Mobile: badges wrap here under the title. */}
+                            <span className="flex flex-wrap items-center gap-1.5 md:hidden">
+                              {trailing}
+                            </span>
                           </div>
                         </div>
-                        <span className="shrink-0 text-xs font-medium text-zinc-400">
-                          {formatDuration(hours)}
-                        </span>
-                        {wasOverdue && (
-                          <span className="shrink-0 rounded bg-rose-100 px-1.5 py-0.5 text-xs font-medium text-rose-600 dark:bg-rose-950 dark:text-rose-400">
-                            late
-                          </span>
-                        )}
-                        {!wasOverdue && todo.due_date && (
-                          <span className="shrink-0 rounded bg-emerald-100 px-1.5 py-0.5 text-xs font-medium text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400">
-                            on time
-                          </span>
-                        )}
-                        {tookLong && !wasOverdue && (
-                          <span className="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:bg-amber-950 dark:text-amber-400">
-                            slow
-                          </span>
-                        )}
+                        {/* Desktop: badges sit on the right of the row. */}
+                        <div className="hidden shrink-0 items-center gap-2 md:flex">
+                          {trailing}
+                        </div>
                       </li>
                     );
                   })}
