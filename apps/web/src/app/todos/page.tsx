@@ -509,7 +509,7 @@ function TodosTab() {
         <div className="min-w-0 flex-1">
           <button
             onClick={() => startEdit(todo)}
-            className={`block w-full truncate text-left text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400 ${
+            className={`w-full text-left text-sm font-medium line-clamp-2 md:line-clamp-none md:block md:truncate hover:text-indigo-600 dark:hover:text-indigo-400 ${
               todo.status === "done" ? "text-zinc-400 line-through" : ""
             } ${isOverdue(todo) ? "text-rose-600 dark:text-rose-400" : ""}`}
           >
@@ -539,7 +539,13 @@ function TodosTab() {
         </span>
         {draggable && (
           <>
-            <span className="hidden text-zinc-300 sm:block dark:text-zinc-700">⠿</span>
+            {/* Grip hint: signals the row is draggable (long-press to drag). */}
+            <span
+              className="shrink-0 text-zinc-300 dark:text-zinc-600"
+              aria-hidden="true"
+            >
+              ⠿
+            </span>
             <span className="flex flex-col sm:hidden">
               <button
                 onClick={() => moveBy(index, -1)}
@@ -560,9 +566,10 @@ function TodosTab() {
             </span>
           </>
         )}
+        {/* Desktop only — mobile deletes via swipe-left. */}
         <button
           onClick={() => removeTodo(todo)}
-          className="pressable flex h-11 w-11 shrink-0 items-center justify-center text-zinc-400 hover:text-rose-500 md:h-6 md:w-6"
+          className="pressable hidden h-11 w-11 shrink-0 items-center justify-center text-zinc-400 hover:text-rose-500 md:flex md:h-6 md:w-6"
           aria-label={`Delete ${todo.title}`}
         >
           ✕
