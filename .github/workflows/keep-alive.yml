@@ -1,5 +1,12 @@
 name: Keep Render backend alive
 
+# NOTE: this is a best-effort BACKUP only. GitHub's scheduled workflows run on
+# shared infra and are frequently delayed well past their cron time (often
+# 30-60+ min), which is longer than Render's 15-min idle timeout — so this
+# alone will not keep the service reliably warm. The primary keep-alive should
+# be an external uptime pinger (e.g. cron-job.org / UptimeRobot) hitting
+# /health every 5-10 min.
+
 on:
   schedule:
     - cron: "*/10 * * * *"
@@ -10,4 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping health endpoint
-        run: curl -fsS --max-time 20 https://cortex-api-vnif.onrender.com/health
+        # A cold start takes ~30-60s, so allow a long timeout and retry through
+        # the boot instead of failing on the very request meant to wake it.
+        run: >
+          curl -fsS
+          --max-time 90
+          --retry 4
+          --retry-delay 20
+          --retry-all-errors
+          https://cortex-api-vnif.onrender.com/health
