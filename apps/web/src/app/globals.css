@@ -275,6 +275,17 @@ body {
   }
 }
 
+/* Suppress the default grey tap-flash on touch; `.pressable` (and our own
+   active/hover styles) already provide press feedback. */
+button,
+a,
+input,
+textarea,
+select,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Tactile press feedback for buttons / tappable rows. Includes color
    transitions so it composes with hover color changes (this rule is
    unlayered and would otherwise override Tailwind's transition-colors). */
