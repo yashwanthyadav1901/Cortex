@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import StatusPill from "@/components/ui/StatusPill";
 import CountUp from "@/components/ui/CountUp";
 import { Skeleton, SkeletonList } from "@/components/ui/Skeleton";
@@ -9,6 +16,8 @@ import { invalidate, useApiQuery } from "@/lib/useApi";
 import { formatDueLabel, formatLocalDate, localDateStr } from "@/lib/dates";
 import { PRIORITY_CYCLE, PRIORITY_DOT, type TodoDraft } from "@/lib/todoUi";
 import TodoSheet from "@/components/todos/TodoSheet";
+import SwipeableRow, { type RowReorder } from "@/components/todos/SwipeableRow";
+import { useDragReorder } from "@/components/todos/useDragReorder";
 import type { Todo, TodoLogs, TodoPriority, TodoStatus } from "@/types";
 
 type Tab = "todos" | "logs";
@@ -40,6 +49,43 @@ function monthLabel(key: string): string {
   const [y, m] = key.split("-");
   const d = new Date(Number(y), Number(m) - 1);
   return d.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+}
+
+/* ─────────────── Reorderable group (touch drag + arrows) ─────────────── */
+
+function ReorderableGroup({
+  title,
+  items,
+  onReorder,
+  renderItem,
+}: {
+  title: string;
+  items: Todo[];
+  onReorder: (orderedIds: string[]) => void;
+  renderItem: (todo: Todo, index: number, reorder: RowReorder) => ReactNode;
+}) {
+  const { listRef, drag, begin, move, end, rowStyle } = useDragReorder(
+    items.map((t) => t.id),
+    onReorder
+  );
+  return (
+    <section>
+      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        {title} · {items.length}
+      </h3>
+      <ul ref={listRef} className="divide-y divide-zinc-100 dark:divide-zinc-900">
+        {items.map((t, i) =>
+          renderItem(t, i, {
+            onStart: (y) => begin(i, y),
+            onMove: move,
+            onEnd: end,
+            dragging: drag?.from === i,
+            style: rowStyle(i),
+          })
+        )}
+      </ul>
+    </section>
+  );
 }
 
 /* ────────────────────── TodosTab ────────────────────── */
@@ -335,7 +381,12 @@ function TodosTab() {
 
   /* ── rendering ── */
 
-  function renderTodoItem(todo: Todo, index: number, draggable: boolean) {
+  function renderTodoItem(
+    todo: Todo,
+    index: number,
+    draggable: boolean,
+    reorder?: RowReorder
+  ) {
     if (editingId === todo.id) {
       return (
         <li key={todo.id} className="py-3">
@@ -404,15 +455,23 @@ function TodosTab() {
     const leaving = leavingIds.has(todo.id);
 
     return (
-      <li
+      <SwipeableRow
         key={todo.id}
-        className={`flex items-center gap-3 py-3 ${
-          draggable ? "cursor-grab active:cursor-grabbing" : ""
-        } ${leaving ? "animate-row-out" : ""}`}
-        draggable={draggable}
-        onDragStart={draggable ? () => handleDragStart(index) : undefined}
-        onDragOver={draggable ? (e) => handleDragOver(e, index) : undefined}
-        onDrop={draggable ? handleDrop : undefined}
+        leaving={leaving}
+        reorderable={draggable}
+        reorder={reorder}
+        onComplete={() => toggleStatus(todo)}
+        onDelete={() => removeTodo(todo)}
+        dragProps={
+          draggable
+            ? {
+                draggable: true,
+                onDragStart: () => handleDragStart(index),
+                onDragOver: (e) => handleDragOver(e, index),
+                onDrop: handleDrop,
+              }
+            : undefined
+        }
       >
         <button
           onClick={() => toggleStatus(todo)}
@@ -508,7 +567,7 @@ function TodosTab() {
         >
           ✕
         </button>
-      </li>
+      </SwipeableRow>
     );
   }
 
@@ -657,12 +716,17 @@ function TodosTab() {
           {renderGroup("Overdue", groups.overdue, false, "text-rose-500")}
           {renderGroup("Today", groups.dueToday, false)}
           {renderGroup("Upcoming", groups.upcoming, false)}
-          {renderGroup(
-            groups.overdue.length + groups.dueToday.length + groups.upcoming.length > 0
-              ? "No date"
-              : "Tasks",
-            groups.noDate,
-            true
+          {groups.noDate.length > 0 && (
+            <ReorderableGroup
+              title={
+                groups.overdue.length + groups.dueToday.length + groups.upcoming.length > 0
+                  ? "No date"
+                  : "Tasks"
+              }
+              items={groups.noDate}
+              onReorder={persistOrder}
+              renderItem={(t, i, reorder) => renderTodoItem(t, i, true, reorder)}
+            />
           )}
           {noPendingVisible && (
             <p className="py-8 text-center text-sm text-zinc-400">
