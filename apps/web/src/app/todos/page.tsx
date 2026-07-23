@@ -395,36 +395,40 @@ function TodosTab() {
         <button
           onClick={() => toggleStatus(todo)}
           aria-label={checked ? "Mark pending" : "Mark done"}
-          className={`pressable flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
-            checked
-              ? "border-emerald-500 bg-emerald-500 text-white"
-              : "border-zinc-300 hover:border-emerald-400 dark:border-zinc-700"
-          } ${checked && justToggledId === todo.id ? "animate-check-reward" : ""}`}
+          className="pressable flex h-11 w-11 shrink-0 items-center justify-center md:h-6 md:w-6"
         >
-          {checked && (
-            <svg
-              className="h-3.5 w-3.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={3}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 13l4 4L19 7"
-                pathLength={24}
-                className={
-                  justToggledId === todo.id ? "animate-check-draw" : undefined
-                }
-              />
-            </svg>
-          )}
+          <span
+            className={`flex h-6 w-6 items-center justify-center rounded-full border ${
+              checked
+                ? "border-emerald-500 bg-emerald-500 text-white"
+                : "border-zinc-300 hover:border-emerald-400 dark:border-zinc-700"
+            } ${checked && justToggledId === todo.id ? "animate-check-reward" : ""}`}
+          >
+            {checked && (
+              <svg
+                className="h-3.5 w-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={3}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                  pathLength={24}
+                  className={
+                    justToggledId === todo.id ? "animate-check-draw" : undefined
+                  }
+                />
+              </svg>
+            )}
+          </span>
         </button>
         <div className="min-w-0 flex-1">
           <button
             onClick={() => startEdit(todo)}
-            className={`block truncate text-left text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400 ${
+            className={`block w-full truncate text-left text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400 ${
               todo.status === "done" ? "text-zinc-400 line-through" : ""
             } ${isOverdue(todo) ? "text-rose-600 dark:text-rose-400" : ""}`}
           >
@@ -453,7 +457,7 @@ function TodosTab() {
                 onClick={() => moveBy(index, -1)}
                 disabled={index === 0}
                 aria-label={`Move ${todo.title} up`}
-                className="px-1 text-xs leading-none text-zinc-300 disabled:opacity-30 dark:text-zinc-600"
+                className="flex h-9 w-9 items-center justify-center text-xs leading-none text-zinc-400 disabled:opacity-30 dark:text-zinc-500"
               >
                 ▲
               </button>
@@ -461,7 +465,7 @@ function TodosTab() {
                 onClick={() => moveBy(index, 1)}
                 disabled={index === groups.noDate.length - 1}
                 aria-label={`Move ${todo.title} down`}
-                className="px-1 text-xs leading-none text-zinc-300 disabled:opacity-30 dark:text-zinc-600"
+                className="flex h-9 w-9 items-center justify-center text-xs leading-none text-zinc-400 disabled:opacity-30 dark:text-zinc-500"
               >
                 ▼
               </button>
@@ -470,7 +474,7 @@ function TodosTab() {
         )}
         <button
           onClick={() => removeTodo(todo)}
-          className="px-1 text-zinc-300 hover:text-rose-500"
+          className="pressable flex h-11 w-11 shrink-0 items-center justify-center text-zinc-400 hover:text-rose-500 md:h-6 md:w-6"
           aria-label={`Delete ${todo.title}`}
         >
           ✕
@@ -497,6 +501,32 @@ function TodosTab() {
     );
   }
 
+  function renderStatusSegments() {
+    return (
+      <div className="flex shrink-0 gap-1 rounded-lg border border-zinc-200 p-0.5 dark:border-zinc-800">
+        {(
+          [
+            ["active", "Active"],
+            ["done", "Done"],
+            ["all", "All"],
+          ] as [StatusFilter, string][]
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setFilterStatus(key)}
+            className={`pressable rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
+              filterStatus === key
+                ? "bg-indigo-600 text-white"
+                : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   if (loading) return <SkeletonList rows={6} className="py-2" />;
 
   const noPendingVisible =
@@ -508,28 +538,9 @@ function TodosTab() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="flex gap-1 rounded-lg border border-zinc-200 p-0.5 dark:border-zinc-800">
-          {(
-            [
-              ["active", "Active"],
-              ["done", "Done"],
-              ["all", "All"],
-            ] as [StatusFilter, string][]
-          ).map(([key, label]) => (
-            <button
-              key={key}
-              onClick={() => setFilterStatus(key)}
-              className={`pressable rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
-                filterStatus === key
-                  ? "bg-indigo-600 text-white"
-                  : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+      {/* Desktop toolbar: everything on one row (unchanged). */}
+      <div className="hidden flex-wrap items-center gap-2 md:flex">
+        {renderStatusSegments()}
         <select
           value={filterPriority}
           onChange={(e) => setFilterPriority(e.target.value as TodoPriority | "")}
@@ -560,6 +571,56 @@ function TodosTab() {
           placeholder="Search…"
           className="min-w-0 flex-1 rounded-lg border border-zinc-300 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900"
         />
+      </div>
+
+      {/* Mobile toolbar: full-width search + horizontal-scroll filter chips. */}
+      <div className="space-y-2 md:hidden">
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search…"
+          className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+        />
+        <div className="no-scrollbar -mx-4 flex items-center gap-2 overflow-x-auto px-4">
+          {renderStatusSegments()}
+          {(
+            [
+              ["", "All"],
+              ["low", "low"],
+              ["medium", "medium"],
+              ["high", "high"],
+            ] as [TodoPriority | "", string][]
+          ).map(([value, label]) => (
+            <button
+              key={label}
+              onClick={() => setFilterPriority(value)}
+              className={`pressable flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-sm font-medium ${
+                filterPriority === value
+                  ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300"
+                  : "border-zinc-200 text-zinc-500 dark:border-zinc-700"
+              }`}
+            >
+              {value && (
+                <span className={`h-2 w-2 rounded-full ${PRIORITY_DOT[value]}`} />
+              )}
+              {label}
+            </button>
+          ))}
+          {allCategories.length > 0 &&
+            ["", ...allCategories].map((c) => (
+              <button
+                key={c || "__all"}
+                onClick={() => setFilterCategory(c)}
+                className={`pressable shrink-0 rounded-full border px-3 py-2 text-sm font-medium ${
+                  filterCategory === c
+                    ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300"
+                    : "border-zinc-200 text-zinc-500 dark:border-zinc-700"
+                }`}
+              >
+                {c || "All categories"}
+              </button>
+            ))}
+        </div>
       </div>
 
       {filterStatus !== "done" && (
