@@ -95,7 +95,10 @@ export default function SwipeableRow({
     const ddx = e.clientX - start.current.x;
     const ddy = e.clientY - start.current.y;
     if (mode.current === "detect") {
-      if (Math.abs(ddy) > Math.abs(ddx) && Math.abs(ddy) > 8) {
+      // Larger tolerance on reorderable rows so small finger jitter during the
+      // long-press hold isn't mistaken for a scroll and doesn't abort the drag.
+      const cancelThreshold = reorder ? 14 : 8;
+      if (Math.abs(ddy) > Math.abs(ddx) && Math.abs(ddy) > cancelThreshold) {
         mode.current = "idle"; // vertical → let the page scroll
         clearLongPress();
         return;
@@ -171,7 +174,15 @@ export default function SwipeableRow({
           transform: `translateX(${dx}px)`,
           transition: animating ? "transform var(--dur-base) var(--ease-out-quart)" : "none",
           touchAction: "pan-y",
-          userSelect: reorder?.dragging ? "none" : undefined,
+          // On reorderable rows, disable text selection / iOS long-press callout up front
+          // so the press-and-hold isn't hijacked by the OS before the drag starts.
+          ...(reorderable
+            ? {
+                userSelect: "none",
+                WebkitUserSelect: "none",
+                WebkitTouchCallout: "none",
+              }
+            : null),
         }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
